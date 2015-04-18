@@ -78,11 +78,10 @@ CREATE TABLE `summoner_spell` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `player_matchup` (
-  `matchup_id` int(10) unsigned NOT NULL,
+  `matchup_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `summoner_id` int(10) unsigned NOT NULL,
   `player_champion_id` int(10) unsigned NOT NULL,
   `opponent_champion_id` int(10) unsigned NOT NULL,
-  `role` varchar(20) DEFAULT NULL,
   `won` int(10) unsigned NOT NULL DEFAULT '0',
   `played` int(10) unsigned NOT NULL DEFAULT '0',
   `kills` int(10) unsigned NOT NULL DEFAULT '0',
@@ -97,7 +96,8 @@ CREATE TABLE `player_matchup` (
   CONSTRAINT `fk_matchup_enemy_champ` FOREIGN KEY (`opponent_champion_id`) REFERENCES `champion` (`champion_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_matchup_player_champ` FOREIGN KEY (`player_champion_id`) REFERENCES `champion` (`champion_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_mathcup_summoner` FOREIGN KEY (`summoner_id`) REFERENCES `player` (`summoner_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9141 DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `player_items` (
   `player_items_id` int(11) NOT NULL,
