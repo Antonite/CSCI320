@@ -19,6 +19,7 @@ public partial class _Default : System.Web.UI.Page
     {
         summoner_id.Text = "";
         status.Text = "";
+        summoner_id.Style.Add("display", "none");
         champ_as.Style.Add("display", "none");
         champ_vs.Style.Add("display", "none");
         champ_button.Style.Add("display", "none");
@@ -105,11 +106,22 @@ public partial class _Default : System.Web.UI.Page
             }
 
             summonerId = reader.GetString(5);
-            //status.Text = summonerId;
+            summoner_id.Text = "";
+            summoner_id.Style.Add("display", "none");
+            infoTable.Style.Add("display", "inline");
         }
         catch (Exception notFound)
         {
-            summoner_id.Text = "Summoner not found";
+            summoner_id.Text = "Summoner " + summoner_box.Text + " not found";
+            summoner_id.Style.Add("display", "inline");
+
+            infoTable.Style.Add("display", "none");
+            champ_as.Style.Add("display", "none");
+            champ_vs.Style.Add("display", "none");
+            champ_button.Style.Add("display", "none");
+
+            connection.Close();
+            return;
         }
 
         //close connection
