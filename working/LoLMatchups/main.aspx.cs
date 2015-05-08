@@ -19,6 +19,7 @@ public partial class _Default : System.Web.UI.Page
     {
         summoner_id.Text = "";
         status.Text = "";
+        status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
         champ_as.Style.Add("display", "none");
         champ_vs.Style.Add("display", "none");
@@ -26,6 +27,52 @@ public partial class _Default : System.Web.UI.Page
         win_as.Text = "";
         win_vs.Text = "";
         connection = connectToServer();
+    }
+
+    protected String parseRank (String rank)
+    {
+        String result = "";
+
+        char div = rank[0];
+        char num = rank[1];
+
+        switch (div)
+        {
+            case 'b': result += "Bronze ";
+                break;
+            case 's': result += "Silver ";
+                break;
+            case 'g': result += "Gold ";
+                break;
+            case 'p': result += "Platinum ";
+                break;
+            case 'd': result += "Diamond ";
+                break;
+            case 'm': result += "Master ";
+                break;
+            case 'c': result += "Challenger ";
+                break;
+            default: result = "Badly formatted rank";
+                break;
+        }
+
+        switch (num)
+        {
+            case '1': result += "I";
+                break;
+            case '2': result += "II";
+                break;
+            case '3': result += "III";
+                break;
+            case '4': result += "IV";
+                break;
+            case '5': result += "V";
+                break;
+            default: result = "Badly formatted rank";
+                break;
+        }
+
+        return result;
     }
 
     protected void submit(object sender, EventArgs e)
@@ -65,57 +112,93 @@ public partial class _Default : System.Web.UI.Page
             TableCell acell = new TableCell();
             acell.Text = "Champion Id";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Played as Won";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Played as Total";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Played vs Won";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Played vs Total";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Summoner Id";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Rank";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "Level";
             arow.Cells.Add(acell);
+
             acell = new TableCell();
             acell.Text = "last_update_match_id";
             arow.Cells.Add(acell);
 
-            infoTable.Rows.Add(arow);
+            //infoTable.Rows.Add(arow);
 
             while (reader.Read())
             {
                 arow = new TableRow();
                 for (int i = 0; i < reader.VisibleFieldCount; i++)
                 {
-
                     acell = new TableCell();
-                    acell.Text = reader.GetString(i);
+                    String str = reader.GetString(i);
+                    acell.Text = str;
+
+                    switch (i)
+                    {
+                        case 0: acell.Attributes.Add("class", "champ-id");
+                                break;
+                        case 1: acell.Attributes.Add("class", "champ-as-won");
+                                break;
+                        case 2: acell.Attributes.Add("class", "champ-as-total");
+                                break;
+                        case 3: acell.Attributes.Add("class", "champ-vs-won");
+                                break;
+                        case 4: acell.Attributes.Add("class", "champ-vs-total");
+                                break;
+                        case 5: acell.Attributes.Add("class", "champ-summoner-id");
+                                break;
+                        case 6: acell.Attributes.Add("class", "champ-summoner-rank");
+                                sum_rank.InnerText = str;
+                                break;
+                        case 7: acell.Attributes.Add("class", "champ-summoner-level");
+                                break;
+                        case 8: acell.Attributes.Add("class", "champ-last-match");
+                                break;
+                    }
                     arow.Cells.Add(acell);
                 }
-                infoTable.Rows.Add(arow);
+                arow.Attributes.Add("class", "champ");
+                //infoTable.Rows.Add(arow);
             }
+
+            sum_name.InnerText = summoner_box.Text;
+            sum_rank.InnerText = parseRank (reader.GetString(6));
 
             summonerId = reader.GetString(5);
             summoner_id.Text = "";
             summoner_id.Style.Add("display", "none");
-            infoTable.Style.Add("display", "inline");
+
+            //infoTable.Style.Add("display", "inline");
         }
         catch (Exception notFound)
         {
             summoner_id.Text = "Summoner " + summoner_box.Text + " not found";
             summoner_id.Style.Add("display", "inline");
 
-            infoTable.Style.Add("display", "none");
+            //infoTable.Style.Add("display", "none");
             champ_as.Style.Add("display", "none");
             champ_vs.Style.Add("display", "none");
             champ_button.Style.Add("display", "none");
