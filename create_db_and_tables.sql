@@ -6,9 +6,11 @@ CREATE TABLE `champion` (
   `champion_id` int(10) unsigned NOT NULL,
   `name` varchar(45) NOT NULL,
   `title` varchar(45) NOT NULL,
+  `image_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`champion_id`),
   UNIQUE KEY `champion_id_UNIQUE` (`champion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `item` (
   `item_id` int(10) unsigned NOT NULL,
@@ -18,9 +20,11 @@ CREATE TABLE `item` (
   `child_id2` int(11) DEFAULT NULL,
   `child_id3` int(11) DEFAULT NULL,
   `child_id4` int(11) DEFAULT NULL,
+  `image_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`item_id`),
   UNIQUE KEY `item_id_UNIQUE` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `mastery` (

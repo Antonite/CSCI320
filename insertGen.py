@@ -11,7 +11,7 @@ def main():
     generateSummonerSpellInsert()
     generateItemInsert()
     generateChampionInsert()
-    #generateAbilityInsert()
+    generateAbilityInsert()
     generateMasteryInsert()
     return
 
@@ -54,7 +54,7 @@ def generateSummonerSpellInsert():
 def generateItemInsert():
     output = SQL_PREFIX + "INSERT INTO item VALUES \n"
     
-    received_byte_data_items = urllib.request.urlopen( API_ROOT + "item?itemListData=from&api_key=" + API_KEY )
+    received_byte_data_items = urllib.request.urlopen( API_ROOT + "item?itemListData=from,image&api_key=" + API_KEY )
     items_json = json.loads( received_byte_data_items.read().decode( "utf-8" ) )["data"]
 
     output_values = ""
@@ -62,6 +62,16 @@ def generateItemInsert():
         if len( output_values )!= 0:
             output_values += ",\n"
         output_values += "(" + item_id + ",\"" + item_data["name"] + "\",\"" + item_data["description"] + "\","
+
+        
+        item_image_url = "http://ddragon.leagueoflegends.com/cdn/5.2.1/img/item/" + item_data["image"]["full"]
+        
+        print( item_image_url )
+        if ( item_id != "3751" and item_id != "3286" and item_id != "3285" ):
+            print( item_id )
+            f = open( "LoLMatchups/ItemImages/" + item_data["image"]["full"],'wb')
+            f.write(urllib.request.urlopen( item_image_url ).read())
+            f.close()
         
         if "from" in item_data.keys():
             for i in range( 4 ):
@@ -76,7 +86,7 @@ def generateItemInsert():
         else:
             output_values += "NULL,NULL,NULL,NULL"
 
-        output_values += ")"
+        output_values += ",\"" + "ItemImages/" + item_data["image"]["full"] + "\")"
             
 
     f = open( TARGET_DIR + "/item_insert.sql", 'w' )
@@ -93,7 +103,8 @@ def generateChampionInsert():
     for ( champ_name, champ_data ) in champs_json.items():
         if len( output_values ) != 0:
             output_values += ",\n"
-        output_values += "(" + str( champ_data["id"] ) + ",\"" + champ_name + "\",\"" + champ_data["title"] + "\")"
+        champ_img_file = "ChampionImages/" + champ_name + "_Square_0.png"
+        output_values += "(" + str( champ_data["id"] ) + ",\"" + champ_name + "\",\"" + champ_data["title"] + "\",\"" + champ_img_file + "\")"
 
     f = open( TARGET_DIR + "/champs_insert.sql", 'w' )
     f.write( output + output_values + ";" )
