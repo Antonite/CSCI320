@@ -85,64 +85,48 @@
                     </div>
                 </div>
 
-                <div id="champion_panel" runat="server" class="fullwidth panel panel_lol test">
-                    Detailed Champ Info
+               <div id="champion_panel" runat="server" class="fullwidth panel panel_lol">
                     <div class="row">
-                    <div id="example_champ" runat="server" class="col-md-2 panel champ_panel">
+                    <%--You can fit 6 champion_tile divs on one line. However, the overflow should occur automatically so you can 
+                        just drop all of the divs into this row div. For the 1st and 6th tiles in every row, you need to subclass
+                        it with champion_tile_first or champion_tile_last so that the margins don't get messed up.
+                        
+                        Note that since champion_panel has a set height, weird stuff will probably happen if you have more than 2 rows of tiles.--%>
+
+                    <%--<div id="example_champ" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
                         <table class="fullwidth center">
                             <tr>
-                                <td class="center">
-                                    <div class="champ_portrait center">
-                                        <table class="fullwidth fullheight">
-                                            <tr>
-                                                <td class="valign-top">Portrait
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="valign-bottom">
-                                                    <div class="champ_name">Champ Name</div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </td>
-                                </tr>
-                                <tr>
                                 <td>
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <div class="champ_as_won">W</div>
-                                        </td>
-                                        <td>
-                                            <div class="champ_as_total">L</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="champ_vs_won">W</div>
-                                        </td>
-                                        <td>
-                                            <div class="champ_vs_total">L</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Last match: 
-                                        </td>
-                                        <td>
-                                            <a href="#" class="last_match">01101001</a>
-                                        </td>
-                                    </tr>
-                                </table>
+                                    <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
+                                    <div class="champion_name">Champ Name</div>
                                 </td>
-                                </tr>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="champion_as_won won">W</div>
+                                    <div class="champion_as_total lost">T</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="champion_vs_won won">W</div>
+                                    <div class="champion_vs_total lost">T</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <a href="#" class=last_match>Last match</a>
+                                </td>
+                            </tr>
                         </table>
+                    </div>--%>
                     </div>
                 </div>
-                </div>
-                <div id="history_panel" runat="server" class="fullwidth panel panel_lol test">Detailed Match History</div>
-                <div id="rune_panel" runat="server" class="fullwidth panel panel_lol test">Detailed Rune Info</div>
-                <div id="mastery_panel" runat="server" class="fullwidth panel panel_lol test">Detailed Mastery Info</div>
+
+
+                <div id="history_panel" runat="server" class="fullwidth panel panel_lol">Detailed Match History</div>
+                <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">Detailed Rune Info</div>
+                <div id="mastery_panel" runat="server" class="fullwidth panel panel_lol">Detailed Mastery Info</div>
                 
                 </br>
             </div>

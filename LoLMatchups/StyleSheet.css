@@ -1,6 +1,6 @@
 ﻿/* Color codes. */
-.won  { color: #00ff00; }
-.lost { color: #ff0000; }
+.won  { color: #444; }
+.lost { color: #888; }
 .bg-main { background: #3f51b5; }
 .bg-dark { background: #3949ab; }
 .bg-lite { background: #5c6bc0; }
@@ -14,6 +14,7 @@
 .hide { display: none; }
 .center { margin-left: auto; margin-right: auto; text-align: center; }
 .fullwidth { width: 100%; }
+.fullerwidth { width: 105%; }
 .fullheight { height: 100%; }
 .valign-top { vertical-align: top; }
 .valign-bottom { vertical-align: bottom; }
@@ -24,6 +25,8 @@ body {
 	margin: 0;
 	-background: url(name.jpg) no-repeat center top fixed;
     -background-size: cover;
+
+    background: #eee;
 }
 
 #container {
@@ -68,10 +71,9 @@ body {
 
 .avatar {
     float: left;
-    margin: 20px;
-
-    padding-top: 78px;
     text-align: center;
+    padding-top: 75px;
+    margin: 20px;
     height: 185px;
     width: 185px;
     border: 4px solid #444;
@@ -80,7 +82,7 @@ body {
 .summoner-name {
     font-size: 32px;
     font-weight: 500;
-    color: #aaa;
+    color: #444;
 
     margin: 5px;
     margin-top: 45px;
@@ -105,43 +107,47 @@ body {
 
 /* Champ stats. */
 
-.champ-table {
-    float: left;
+#champion_panel {
+    background: transparent;
+    padding: 16px;
+    padding-top: 0px;
 }
 
-.champ_panel_old {
+.champion_tile {
     font-size: 14px;
     height: auto;
-    background: #ccc;
+    width: 180px;
+    padding-top: 20px;
+    padding-bottom: 25px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 20px;
+    background: #fff;
 }
 
-.champ_panel {
-    font-size: 14px;
-    height: auto;
-    background: #ccc;
-}
+.champion_tile_first { margin-left: 0; }
+.champion_tile_last  { margin-right: 0; }
 
-.champ_portrait {
+.champion_portrait {
     width: 105px;
     height: 105px;
-
-    text-align: center; 
     margin: 7px;
 
-    border: 2px solid white;
+    border: 3px solid #aaa;
+    border-radius: 50%;
 }
 
-.champ_name {
+.champion_name {
     width: 100%;
     text-align: center;
-    
     padding: 3px;
 
-    background: rgba(0,0,0,.7);
-    color: #fff;
+    font-size: 20px;
+    font-weight: 500;
 }
 
-.champ_as_won, .champ_as_total, .champ_vs_won, .champ_vs_total {
+.champion_as_won, .champion_as_total, .champion_vs_won, .champion_vs_total {
+    font-size: 16px;
     display: inline;
 }
 
