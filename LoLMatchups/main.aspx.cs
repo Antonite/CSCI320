@@ -12,18 +12,67 @@ using MySql.Data.MySqlClient;
 public partial class _Default : System.Web.UI.Page
 {
     //todo case sensitivity
+    private System.ComponentModel.IContainer components;
     private MySqlConnection connection;
-    private static String summonerId;
+    private String summonerId;
     protected void Page_Load(object sender, EventArgs e)
     {
         summoner_id.Text = "";
         status.Text = "";
+        status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
         champ_as.Style.Add("display", "none");
         champ_vs.Style.Add("display", "none");
         champ_button.Style.Add("display", "none");
-        matchupStatus.Text = "";
+        win_as.Text = "";
+        win_vs.Text = "";
         connection = connectToServer();
+    }
+
+    protected String parseRank (String rank)
+    {
+        String result = "";
+
+        char div = rank[0];
+        char num = rank[1];
+
+        switch (div)
+        {
+            case 'b': result += "Bronze ";
+                break;
+            case 's': result += "Silver ";
+                break;
+            case 'g': result += "Gold ";
+                break;
+            case 'p': result += "Platinum ";
+                break;
+            case 'd': result += "Diamond ";
+                break;
+            case 'm': result += "Master ";
+                break;
+            case 'c': result += "Challenger ";
+                break;
+            default: result = "Badly formatted rank";
+                break;
+        }
+
+        switch (num)
+        {
+            case '1': result += "I";
+                break;
+            case '2': result += "II";
+                break;
+            case '3': result += "III";
+                break;
+            case '4': result += "IV";
+                break;
+            case '5': result += "V";
+                break;
+            default: result = "Badly formatted rank";
+                break;
+        }
+
+        return result;
     }
 
     protected void submit(object sender, EventArgs e)
@@ -56,63 +105,19 @@ public partial class _Default : System.Web.UI.Page
         try
         {
             reader = cmd.ExecuteReader();
+            reader.Read();
 
-            //add custom header row
-            //(to be removed upon addition of column names in db)
-            TableRow arow = new TableRow();
-            TableCell acell = new TableCell();
-            acell.Text = "Champion Id";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Played as Won";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Played as Total";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Played vs Won";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Played vs Total";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Summoner Id";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Rank";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "Level";
-            arow.Cells.Add(acell);
-            acell = new TableCell();
-            acell.Text = "last_update_match_id";
-            arow.Cells.Add(acell);
-
-            infoTable.Rows.Add(arow);
-            while (reader.Read())
-            {
-                
-                arow = new TableRow();
-                for (int i = 0; i < reader.VisibleFieldCount; i++)
-                {
-                    acell = new TableCell();
-                    acell.Text = reader.GetString(i);
-                    arow.Cells.Add(acell);
-                }
-                infoTable.Rows.Add(arow);
-            }
+            sum_name.InnerText = summoner_box.Text;
+            sum_rank.InnerText = parseRank (reader.GetString(6));
 
             summonerId = reader.GetString(5);
             summoner_id.Text = "";
             summoner_id.Style.Add("display", "none");
-            infoTable.Style.Add("display", "inline");
         }
         catch (Exception notFound)
         {
             summoner_id.Text = "Summoner " + summoner_box.Text + " not found";
             summoner_id.Style.Add("display", "inline");
-
-            infoTable.Style.Add("display", "none");
             champ_as.Style.Add("display", "none");
             champ_vs.Style.Add("display", "none");
             champ_button.Style.Add("display", "none");
@@ -137,20 +142,18 @@ public partial class _Default : System.Web.UI.Page
         MySqlDataReader reader;
         //search for summoner, Dynamic SQL
         MySqlCommand cmd = new MySqlCommand();
-        cmd.CommandText =
-            "SELECT player.name," +
-            "opponent.name," +
+        cmd.CommandText = 
+            "SELECT player_matchup.player_champion_id," +
+            "player_matchup.player_champion_id," +
             "player_matchup.won," +
             "player_matchup.played " +
-            "FROM lolmatchups.player_matchup " +
-            "join lolmatchups.champion player on player_matchup.player_champion_id = player.champion_id " +
-            "join lolmatchups.champion opponent on player_matchup.opponent_champion_id = opponent.champion_id" +
-                " where player.name = @as" +
-                " and opponent.name = @vs" +
+            "FROM lolmatchups.player_matchup" +
+                " where lolmatchups.player_matchup.player_champion_id = @as " +
+                "and lolmatchups.player_matchup.opponent_champion_id = @vs" +
                 " and lolmatchups.player_matchup.summoner_id = @id";
-        cmd.Parameters.Add("@as", MySqlDbType.VarChar, 32);
+        cmd.Parameters.Add("@as", MySqlDbType.VarChar, 8);
         cmd.Parameters["@as"].Value = champ_as.Text;
-        cmd.Parameters.Add("@vs", MySqlDbType.VarChar, 32);
+        cmd.Parameters.Add("@vs", MySqlDbType.VarChar, 8);
         cmd.Parameters["@vs"].Value = champ_vs.Text;
         cmd.Parameters.Add("@id", MySqlDbType.VarChar, 8);
         cmd.Parameters["@id"].Value = summonerId;
@@ -165,23 +168,12 @@ public partial class _Default : System.Web.UI.Page
         try
         {
             reader = cmd.ExecuteReader();
-            if (reader.HasRows)
-            {
+            reader.Read();
 
-               reader.Read();
-               
-               //calculate win % and diplay
-               float winPercent = reader.GetFloat(2) / reader.GetFloat(3) * 100;
-               matchupStatus.Text = reader.GetString(0) + " vs " + reader.GetString(1) + " " + winPercent + "%";
-
-            }
-            else
-            {
-                matchupStatus.Text = "No data found";
-            }
+            win_as.Text = reader.GetString(0);
         } catch (Exception notFound)
         {
-            matchupStatus.Text = notFound.ToString();
+            win_as.Text = notFound.ToString();
         }
     }
 

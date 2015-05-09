@@ -1,4 +1,23 @@
-﻿/*Generic page styling*/
+﻿/* Color codes. */
+.won  { color: #444; }
+.lost { color: #888; }
+.bg-main { background: #3f51b5; }
+.bg-dark { background: #3949ab; }
+.bg-lite { background: #5c6bc0; }
+
+/* Fonts. */
+.roboto { font-family: "Roboto"; }
+.fa-med { font-size:   24px; text-align: center;}
+
+/* Layout */
+.test { border: 3px solid #ff0000; }
+.hide { display: none; }
+.center { margin-left: auto; margin-right: auto; text-align: center; }
+.fullwidth { width: 100%; }
+.fullerwidth { width: 105%; }
+.fullheight { height: 100%; }
+.valign-top { vertical-align: top; }
+.valign-bottom { vertical-align: bottom; }
 
 body {
 	font-family: "Roboto", "Segoe UI", "Helvetica", "Arial", San-serif;
@@ -6,20 +25,18 @@ body {
 	margin: 0;
 	-background: url(name.jpg) no-repeat center top fixed;
     -background-size: cover;
+
+    background: #eee;
 }
 
-#form1 {
+#container {
     max-width: 1170px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.center { margin-left: auto; margin-right: auto; text-align: center; }
-
-.fullwidth { width: 100%; }
-
 .upper {
-    height: 618px;
+    height: 307px;
     width: 100%;
 
     background-color:#3f51b5;
@@ -30,20 +47,113 @@ body {
     font-family: "FontAwesome";
 }
 
-#summoner-panel {
-    width: 80%;
-    height: 300px;
+/* Summoner panel. */
 
-    margin-top: 42px;
+#summoner_panel {
+    width: 100%;
+    height: 280px;
+
+    margin-top: 0;
     margin-left: auto ;
     margin-right: auto ;
+
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
     
+    text-align: left;
+
+    background-color: #fff;
+    color: #222;
+    border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-#champ_matchup {
-    width: 80%;
+.avatar {
+    float: left;
+    text-align: center;
+    padding-top: 75px;
+    margin: 20px;
+    height: 185px;
+    width: 185px;
+    border: 4px solid #444;
+}
 
+.summoner-name {
+    font-size: 32px;
+    font-weight: 500;
+    color: #444;
+
+    margin: 5px;
+    margin-top: 45px;
+    margin-bottom: 0px;
+}
+
+.summoner-rank {
+    font-size: 20px;
+    font-weight: 300;
+    color: #aaa;
+
+    margin-top: 0px;
+}
+
+.summoner-winrate {
+    font-size: 14px;
+    font-weight: 300;
+    color: #aaa;
+
+    margin-top: 5px;
+}
+
+/* Champ stats. */
+
+#champion_panel {
+    background: transparent;
+    padding: 16px;
+    padding-top: 0px;
+}
+
+.champion_tile {
+    font-size: 14px;
+    height: auto;
+    width: 180px;
+    padding-top: 20px;
+    padding-bottom: 25px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 20px;
+    background: #fff;
+}
+
+.champion_tile_first { margin-left: 0; }
+.champion_tile_last  { margin-right: 0; }
+
+.champion_portrait {
+    width: 105px;
+    height: 105px;
+    margin: 7px;
+
+    border: 3px solid #aaa;
+    border-radius: 50%;
+}
+
+.champion_name {
+    width: 100%;
+    text-align: center;
+    padding: 3px;
+
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.champion_as_won, .champion_as_total, .champion_vs_won, .champion_vs_total {
+    font-size: 16px;
+    display: inline;
+}
+
+/* Matchups. */
+
+#champ_matchup {
     margin-top: 50px;
     margin-left: auto ;
     margin-right: auto ;
@@ -55,30 +165,10 @@ body {
     background: #fff;
 }
 
-.vs-text {
-    text-align: center;
-    padding-top: 2px;
-    color: #fff;
-    font-weight: 700;
-    font-size: 24px;
-}
-
-.vs-circle {
-    text-align: center;
-
-    padding-left: 6px;
-    width: 42px;
-    height: 42px;
-
-    color: #fff;
-    background-color: #ff4081;
-
-    border-radius: 50%;
-}
-
 /*Bootstrap theme for LoLMatchups*/
 
 .navbar-lol {
+    padding-top: 7px;
     background-color:#3949ab;
 }
 
@@ -90,25 +180,45 @@ body {
     color: #fff;
 }
 
+.summoner-navbar-lol {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+
+    margin-top: 0px;
+    margin-bottom: 15px;
+}
+
 .text-lol {
-    border: none;
     height: 42px;
     padding: 9px;
 }
 
-.btn-lol {
-    height: 42px;
+.text-nav-lol {
     border: none;
 }
 
-.panel-lol {
-    color: #fff;
-    background: transparent;
-    box-shadow: none;
+.btn-lol {
+    height: 42px;
 }
 
-.table-lol {
-    font-weight: 500;
+.btn-nav-lol {
+    height: 34px;
+    width: 34px;
+    border: none;
+    background: #fff;
+}
+
+.panel_lol {
+    height: 600px;
+    margin-top: 20px;
+    padding: 20px;
+    text-align: left;
+    font-size: 24px;
+    box-shadow: none;
 }
 
 .jumbotron-lol {
@@ -118,6 +228,8 @@ body {
     padding-top: 1px;
     padding-left: 20px;
 }
+
+/* JQuery helper classes */
 
 /*ASP.NET default form element styles*/
 /*
