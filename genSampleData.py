@@ -9,6 +9,10 @@ def main():
     player_rune_file_name = "sample_player_runes.sql"
     player_ss_file_name = "sample_player_ss.sql"
     player_items_file_name = "sample_player_items.sql"
+    best_mastery_file_name = "sample_best_mastery.sql"
+    best_ss_file_name = "sample_best_ss.sql"
+    best_rune_file_name = "sample_best_runes.sql"
+    best_items_file_name = "sample_best_items.sql"
 
     players = {}
 
@@ -115,23 +119,35 @@ def main():
                         if match_id > players[summoner_id]["last_match_id"]:
                             players[summoner_id]["last_match_id"] = match_id
     
-    player_file = open( player_file_name, 'w' )
-    player_champ_file = open( player_champion_file_name, 'w' )
-    player_matchup_file = open( player_matchup_file_name, 'w' )
-    player_mastery_file = open( player_mastery_file_name, 'w' )
-    player_rune_file = open( player_rune_file_name, 'w' )
-    player_ss_file = open( player_ss_file_name, 'w' )
-    player_items_file = open( player_items_file_name, 'w' )
+    #player_file = open( player_file_name, 'w' )
+    #player_champ_file = open( player_champion_file_name, 'w' )
+    #player_matchup_file = open( player_matchup_file_name, 'w' )
+    #player_mastery_file = open( player_mastery_file_name, 'w' )
+    #player_rune_file = open( player_rune_file_name, 'w' )
+    #player_ss_file = open( player_ss_file_name, 'w' )
+    #player_items_file = open( player_items_file_name, 'w' )
+    best_mastery_file = open( best_mastery_file_name, 'w' )
+    best_rune_file = open( best_rune_file_name, 'w' )
+    best_ss_file = open( best_ss_file_name, 'w' )
+    best_items_file = open( best_items_file_name, 'w' )
 
     player_output = "USE lolmatchups;\nINSERT INTO player VALUES "
     player_champ_output = "USE lolmatchups;\nINSERT INTO player_champion_stat VALUES "
     player_matchup_output = "USE lolmatchups;\nINSERT INTO player_matchup VALUES "
-    player_mastery_output = "USE lolmatchups;\nINSERT INTO player_mastery(matchup_id, offense_values, defense_values, utility_values, won, used) VALUES "
-    player_rune_output = "USE lolmatchups;\nINSERT INTO player_rune_set(matchup_id,rune_id1,rune_id2,rune_id3,rune_id4,rune_id5,rune_id6,rune_id7,rune_id8,rune_id9,rune_id10,rune_id11,rune_id12,rune_id13,rune_id14,rune_id15,rune_id16,rune_id17,rune_id18,rune_id19,rune_id20,rune_id21,rune_id22,rune_id23,rune_id24,rune_id25,rune_id26,rune_id27,rune_id28,rune_id29,rune_id30,won,used) VALUES "
-    player_ss_output = "USE lolmatchups;\nINSERT INTO player_summoner_spells(matchup_id,ss_id1,ss_id2,won,used) VALUES "
-    player_items_output = "USE lolmatchups;\nINSERT INTO player_items(matchup_id, item_id1, item_id2, item_id3, item_id4, item_id5, item_id6, item_id7, won, used) VALUES "
+    player_mastery_output = "USE lolmatchups;\nINSERT INTO player_mastery VALUES "
+    player_rune_output = "USE lolmatchups;\nINSERT INTO player_rune_set VALUES "
+    player_ss_output = "USE lolmatchups;\nINSERT INTO player_summoner_spells VALUES "
+    player_items_output = "USE lolmatchups;\nINSERT INTO player_items VALUES "
+    best_mastery_output = "USE lolmatchups;\nINSERT INTO best_matchup_masteries VALUES "
+    best_rune_output = "USE lolmatchups;\nINSERT INTO best_matchup_rune_set VALUES "
+    best_ss_output = "USE lolmatchups;\nINSERT INTO best_matchup_ss VALUES "
+    best_items_output = "USE lolmatchups;\nINSERT INTO best_matchup_items VALUES "
 
     matchup_count = 1
+    player_ss_count = 1
+    player_rune_count = 1
+    player_mastery_count = 1
+    player_items_count = 1
     for ( summoner_id, player_info ) in players.items():
         random_rank = random.choice( rank_prefixes ) + random.choice( rank_suffixes )
         player_output += "(" + str( summoner_id ) + ",\"" + player_info["summoner_name"] + "\",\"" + random_rank + "\"," + "30" + "," + str( player_info["last_match_id"] ) + "),\n"
@@ -146,13 +162,21 @@ def main():
             item_list = matchup_info["items"]
             player_matchup_output += "(" + str( matchup_count ) + "," + str( summoner_id ) + "," + player_champ_id + "," + opp_champ_id + "," + str( matchup_info["won"] ) + "," + str( matchup_info["played"] ) + "," + str( matchup_info["kills"] ) + "," + str( matchup_info["deaths"] ) + "," + str( matchup_info["assists"] ) + "," + str( matchup_info["creep_score"] ) + "),\n"
             for ss in ss_list:
-                player_ss_output += "(" + str( matchup_count ) + "," + getSSOutput( ss ) + "),\n"
+                player_ss_output += "(" + str( player_ss_count ) + "," + str( matchup_count ) + "," + getSSOutput( ss ) + "),\n"
+                best_ss_output += "(" + str( matchup_count ) + "," + str( player_ss_count ) + "),\n"
+                player_ss_count += 1
             for runes in rune_list:
-                player_rune_output += "(" + str( matchup_count ) + "," + getRuneOutput( runes ) + "),\n"
+                player_rune_output += "(" + str( player_rune_count ) + "," + str( matchup_count ) + "," + getRuneOutput( runes ) + "),\n"
+                best_rune_output += "(" + str( matchup_count ) + "," + str( player_rune_count ) + "),\n"
+                player_rune_count += 1
             for mastery in mastery_list:
-                player_mastery_output += "(" + str( matchup_count ) + "," + getMasteryOutput( mastery ) + "),\n"
+                player_mastery_output += "(" + str( player_mastery_count ) + "," + str( matchup_count ) + "," + getMasteryOutput( mastery ) + "),\n"
+                best_mastery_output += "(" + str( matchup_count ) + "," + str( player_mastery_count ) + "),\n"
+                player_mastery_count += 1
             for items in item_list:
-                player_items_output += "(" + str( matchup_count ) + "," + getItemsOutput( items ) + "),\n"
+                player_items_output += "(" + str( player_items_count ) + "," + str( matchup_count ) + "," + getItemsOutput( items ) + "),\n"
+                best_items_output += "(" + str( matchup_count ) + "," + str( player_items_count ) + "),\n"
+                player_items_count += 1
             matchup_count += 1
 
     player_output = player_output[:-2] + ";"
@@ -162,14 +186,22 @@ def main():
     player_rune_output = player_rune_output[:-2] + ";"
     player_ss_output = player_ss_output[:-2] + ";"
     player_items_output = player_items_output[:-2] + ";"
+    best_mastery_output = best_mastery_output[:-2] + ";"
+    best_rune_output = best_rune_output[:-2] + ";"
+    best_ss_output = best_ss_output[:-2] + ";"
+    best_items_output = best_items_output[:-2] + ";"
 
     #player_file.write( player_output )
     #player_champ_file.write( player_champ_output )
-    player_matchup_file.write( player_matchup_output )
-    player_mastery_file.write( player_mastery_output )
-    player_rune_file.write( player_rune_output )
-    player_ss_file.write( player_ss_output )
-    player_items_file.write( player_items_output )
+    #player_matchup_file.write( player_matchup_output )
+    #player_mastery_file.write( player_mastery_output )
+    #player_rune_file.write( player_rune_output )
+    #player_ss_file.write( player_ss_output )
+    #player_items_file.write( player_items_output )
+    best_items_file.write( best_items_output )
+    best_rune_file.write( best_rune_output )
+    best_ss_file.write( best_ss_output )
+    best_mastery_file.write( best_mastery_output )
 
 
 

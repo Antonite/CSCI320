@@ -61,7 +61,7 @@ def generateItemInsert():
     for( item_id, item_data ) in items_json.items():
         if len( output_values )!= 0:
             output_values += ",\n"
-        output_values += "(" + item_id + ",\"" + item_data["description"] + "\","
+        output_values += "(" + item_id + ",\"" + item_data["name"] + "\",\"" + item_data["description"] + "\","
         
         if "from" in item_data.keys():
             for i in range( 4 ):

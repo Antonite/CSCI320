@@ -12,6 +12,7 @@ CREATE TABLE `champion` (
 
 CREATE TABLE `item` (
   `item_id` int(10) unsigned NOT NULL,
+  `name` varchar(45) NOT NULL,
   `description` varchar(900) NOT NULL,
   `child_id1` int(11) DEFAULT NULL,
   `child_id2` int(11) DEFAULT NULL,
@@ -20,6 +21,7 @@ CREATE TABLE `item` (
   PRIMARY KEY (`item_id`),
   UNIQUE KEY `item_id_UNIQUE` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `mastery` (
   `mastery_id` int(10) unsigned NOT NULL,
@@ -99,7 +101,7 @@ CREATE TABLE `player_matchup` (
 ) ENGINE=InnoDB AUTO_INCREMENT=9127 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `player_items` (
-  `player_items_id` int(11) NOT NULL AUTO_INCREMENT,
+  `player_items_id` int(10) unsigned NOT NULL,
   `matchup_id` int(10) unsigned NOT NULL,
   `item_id1` int(10) unsigned DEFAULT NULL,
   `item_id2` int(10) unsigned DEFAULT NULL,
@@ -127,10 +129,11 @@ CREATE TABLE `player_items` (
   CONSTRAINT `fk_item6_items` FOREIGN KEY (`item_id6`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_item7_items` FOREIGN KEY (`item_id7`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_item_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9128 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `player_mastery` (
-  `player_mastery_id` int(11) NOT NULL AUTO_INCREMENT,
+  `player_mastery_id` int(10) unsigned NOT NULL,
   `matchup_id` int(10) unsigned NOT NULL,
   `offense_values` varchar(100) NOT NULL,
   `defense_values` varchar(100) NOT NULL,
@@ -140,10 +143,11 @@ CREATE TABLE `player_mastery` (
   PRIMARY KEY (`player_mastery_id`),
   KEY `fk_matchup_mastery_idx` (`matchup_id`),
   CONSTRAINT `fk_mastery_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=18255 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `player_rune_set` (
-  `player_rune_set_id` int(11) NOT NULL AUTO_INCREMENT,
+  `player_rune_set_id` int(10) unsigned NOT NULL,
   `matchup_id` int(10) unsigned NOT NULL,
   `rune_id1` int(10) unsigned DEFAULT NULL,
   `rune_id2` int(10) unsigned DEFAULT NULL,
@@ -240,10 +244,11 @@ CREATE TABLE `player_rune_set` (
   CONSTRAINT `fk_rune9_runes` FOREIGN KEY (`rune_id9`) REFERENCES `rune` (`rune_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_runes6_runes` FOREIGN KEY (`rune_id6`) REFERENCES `rune` (`rune_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_rune_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9128 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `player_summoner_spells` (
-  `player_summoner_spells_id` int(11) NOT NULL AUTO_INCREMENT,
+  `player_summoner_spells_id` int(10) unsigned NOT NULL,
   `matchup_id` int(10) unsigned NOT NULL,
   `ss_id1` int(10) unsigned NOT NULL,
   `ss_id2` int(10) unsigned NOT NULL,
@@ -256,7 +261,47 @@ CREATE TABLE `player_summoner_spells` (
   CONSTRAINT `fk_ss1_ss` FOREIGN KEY (`ss_id1`) REFERENCES `summoner_spell` (`summoner_spell_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ss2_ss` FOREIGN KEY (`ss_id2`) REFERENCES `summoner_spell` (`summoner_spell_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ss_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9128 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `best_matchup_items` (
+  `matchup_id` int(10) unsigned NOT NULL,
+  `player_items_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`matchup_id`),
+  UNIQUE KEY `matchup_id_UNIQUE` (`matchup_id`),
+  UNIQUE KEY `player_items_id_UNIQUE` (`player_items_id`),
+  CONSTRAINT `fk_player_items_best_items` FOREIGN KEY (`player_items_id`) REFERENCES `player_items` (`player_items_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_matchup_best_items` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `best_matchup_masteries` (
+  `matchup_id` int(10) unsigned NOT NULL,
+  `player_mastery_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`matchup_id`),
+  UNIQUE KEY `player_mastery_id_UNIQUE` (`player_mastery_id`),
+  UNIQUE KEY `matchup_id_UNIQUE` (`matchup_id`),
+  CONSTRAINT `fk_matchup_best_masteries` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_player_masteries_best_matchup` FOREIGN KEY (`player_mastery_id`) REFERENCES `player_mastery` (`player_mastery_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `best_matchup_rune_set` (
+  `matchup_id` int(10) unsigned NOT NULL,
+  `player_rune_set_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`matchup_id`),
+  UNIQUE KEY `player_rune_set_id_UNIQUE` (`player_rune_set_id`),
+  UNIQUE KEY `matchup_id_UNIQUE` (`matchup_id`),
+  CONSTRAINT `fk_player_runes_best_matchup` FOREIGN KEY (`player_rune_set_id`) REFERENCES `player_rune_set` (`player_rune_set_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_matchup_best_runes` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `best_matchup_ss` (
+  `matchup_id` int(10) unsigned NOT NULL,
+  `player_summoner_spells_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`matchup_id`),
+  UNIQUE KEY `player_summoner_spells_id_UNIQUE` (`player_summoner_spells_id`),
+  UNIQUE KEY `matchup_id_UNIQUE` (`matchup_id`),
+  CONSTRAINT `fk_matchup_best_ss` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_player_ss_best_matchup` FOREIGN KEY (`player_summoner_spells_id`) REFERENCES `player_summoner_spells` (`player_summoner_spells_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `lolmatchups`.`player` (`summoner_id`,`name`,`rank`,`level`,`last_update_match_id`) VALUES ( 22101250,"Kowz Rule","P4",30,1);
 
