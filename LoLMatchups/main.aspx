@@ -73,14 +73,87 @@
                             <asp:Button ID="champ_button" runat="server" OnClick="getMatchups" Text="Get Matchup" class="btn btn-default btn-lol" />
                         </div>
                     </div>
-                    <div id="matchup_panel" runat="server" class="fullwidth panel panel_lol test">
-                        Detailed Matchup Info
-                        <div id="matchup_as">
-                            <asp:Label ID="win_as" runat="server" Text="win_as"></asp:Label>
-                        </div>
 
-                        <div id="matchup_vs">
-                            <asp:Label ID="win_vs" runat="server" Text="win_vs"></asp:Label>
+
+                    <div id="matchup_panel" runat="server" class="fullwidth panel panel_lol test">
+                        <div ID="matchupStatsPanel">
+                            <asp:Label ID="matchupStats" runat="server" Text="matchupStats"></asp:Label>
+                            <table class="fullwidth center">
+                                <tr>
+                                    <td>
+                                        <img src="http://placekitten.com/g/150/150" class="champion_portrait center" />
+                                        <div class="champion_name"><asp:Label ID="ChampAsName" runat="server" Text="ChampAsName"></asp:Label></div>
+                                    </td>
+                                    <td>
+                                        <div class="champion_name">VS</div>
+                                    </td>
+                                    <td>
+                                        <img src="http://placekitten.com/g/150/150" class="champion_portrait center" />
+                                        <div class="champion_name"><asp:Label ID="ChampVsName" runat="server" Text="ChampVSName"></asp:Label></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td><td><asp:Label ID="matchupPercent" runat="server" Text="matchupPercent"></asp:Label></td><td></td>
+                                </tr>
+                                <tr class="blank_row">
+                                </tr>
+                                <tr>
+                                    <td>Items:</td>
+                                        <td><asp:Label ID="matchupTopItems" runat="server" Text="matchupTopItems"></asp:Label>
+                                            <div class="container hide" runat="server">
+                                                    <div class="col-xs-1 thumb" id="itemImg1">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage1">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-1 thumb">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-1 thumb">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-1 thumb">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-1 thumb">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-1 thumb">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-xs-1 thumb">
+                                                        <a class="thumbnail" href="#">
+                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        </a>
+                                                    </div>
+                                            </div>
+                                      </td>
+                                    <td><asp:Label ID="matchupTopItemsPercent" runat="server" Text="matchupTopItemsPercent"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td>Runes:</td>
+                                    <td><asp:Label ID="matchupTopRunes" runat="server" Text="matchupTopRunes"></asp:Label></td>
+                                    <td><asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td>Masteries:</td>
+                                    <td><asp:Label ID="matchupTopMasteries" runat="server" Text="matchupTopMasteries"></asp:Label></td>
+                                    <td><asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label></td>
+                                </tr>
+                            </table>
+                            
+                            
+
                         </div>
                     </div>
                 </div>
