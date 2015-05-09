@@ -38,7 +38,8 @@
                     <table class="fullwidth fullheight">
                         <tr>
                             <td class="valign-top">
-                                <div id="sum_avatar" runat="server" class="avatar">Avatar</div>
+                                <%--<div id="sum_avatar" runat="server" class="avatar"></div>--%>
+                                <img id="sum_avatar" runat="server" src="http://placekitten.com/g/185/185" class="avatar"/>
                                 <div id="sum_name" runat="server" class="summoner-name">Summoner Name</div>
                                 <div id="sum_rank" runat="server" class="summoner-rank">Rank</div>
                                 <div id="sum_winrate" runat="server" class="summoner-winrate">W / L</div>
@@ -73,87 +74,145 @@
                             <asp:Button ID="champ_button" runat="server" OnClick="getMatchups" Text="Get Matchup" class="btn btn-default btn-lol" />
                         </div>
                     </div>
+                </div>
 
+                <div id="matchup_panel" runat="server" class="fullwidth panel panel_lol">
+                    <div id="matchupStatsPanel">
+                        <asp:Label ID="matchupStats" runat="server" Text="matchupStats"></asp:Label>
 
-                    <div id="matchup_panel" runat="server" class="fullwidth panel panel_lol test">
-                        <div ID="matchupStatsPanel">
-                            <asp:Label ID="matchupStats" runat="server" Text="matchupStats"></asp:Label>
-                            <table class="fullwidth center">
-                                <tr>
-                                    <td>
-                                        <img src="http://placekitten.com/g/150/150" class="champion_portrait center" />
-                                        <div class="champion_name"><asp:Label ID="ChampAsName" runat="server" Text="ChampAsName"></asp:Label></div>
-                                    </td>
-                                    <td>
-                                        <div class="champion_name">VS</div>
-                                    </td>
-                                    <td>
-                                        <img src="http://placekitten.com/g/150/150" class="champion_portrait center" />
-                                        <div class="champion_name"><asp:Label ID="ChampVsName" runat="server" Text="ChampVSName"></asp:Label></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td></td><td><asp:Label ID="matchupPercent" runat="server" Text="matchupPercent"></asp:Label></td><td></td>
-                                </tr>
-                                <tr class="blank_row">
-                                </tr>
-                                <tr>
-                                    <td>Items:</td>
-                                        <td><asp:Label ID="matchupTopItems" runat="server" Text="matchupTopItems"></asp:Label>
-                                            <div class="container hide" runat="server">
-                                                    <div class="col-xs-1 thumb" id="itemImg1">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage1">
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-xs-1 thumb">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-xs-1 thumb">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-xs-1 thumb">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-xs-1 thumb">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-xs-1 thumb">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-xs-1 thumb">
-                                                        <a class="thumbnail" href="#">
-                                                            <img class="img-responsive" src="http://placehold.it/50x50" alt="">
-                                                        </a>
-                                                    </div>
+                        <div class="row">
+                            <div id="champ_as_tile" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
+                                <table class="fullwidth center">
+                                    <tr>
+                                        <td>
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
+                                            <div class="champion_name">
+                                                <asp:Label ID="ChampAsName" runat="server" Text="ChampAsName"></asp:Label>
                                             </div>
-                                      </td>
-                                    <td><asp:Label ID="matchupTopItemsPercent" runat="server" Text="matchupTopItemsPercent"></asp:Label></td>
-                                </tr>
-                                <tr>
-                                    <td>Runes:</td>
-                                    <td><asp:Label ID="matchupTopRunes" runat="server" Text="matchupTopRunes"></asp:Label></td>
-                                    <td><asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label></td>
-                                </tr>
-                                <tr>
-                                    <td>Masteries:</td>
-                                    <td><asp:Label ID="matchupTopMasteries" runat="server" Text="matchupTopMasteries"></asp:Label></td>
-                                    <td><asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label></td>
-                                </tr>
-                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="champion_as_won won">W</div>
+                                            <div class="champion_as_total lost">T</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="champion_vs_won won">W</div>
+                                            <div class="champion_vs_total lost">T</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="#" class="last_match">Last match</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                             
-                            
+                            <div id="matchup_info" class="col-md-8 panel">
+                                <table class="fullwidth center">
+                                    <tr>
+                                        <td>
+                                            <asp:Label ID="matchupPercent" runat="server" Text="matchupPercent"></asp:Label>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="fullwidth">
+                                    <tr>
+                                        <td>
+                                            <asp:Label ID="matchupTopItems" runat="server" Text="matchupTopItems"></asp:Label>
+                                            <div class="container row" runat="server">
+                                                <div class="col-xs-1">
+                                                    Items:
+                                                </div>
+                                                <div class="col-xs-1 thumb" id="itemImg1">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage1">
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-1 thumb">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-1 thumb">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-1 thumb">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-1 thumb">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-1 thumb">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                    </a>
+                                                </div>
+                                                <div class="col-xs-1 thumb">
+                                                    <a class="thumbnail" href="#">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <asp:Label ID="matchupTopItemsPercent" runat="server" Text="matchupTopItemsPercent"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Runes:</td>
+                                        <td>
+                                            <asp:Label ID="matchupTopRunes" runat="server" Text="matchupTopRunes"></asp:Label></td>
+                                        <td>
+                                            <asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Masteries:</td>
+                                        <td>
+                                            <asp:Label ID="matchupTopMasteries" runat="server" Text="matchupTopMasteries"></asp:Label></td>
+                                        <td>
+                                            <asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label></td>
+                                    </tr>
+                                </table>
+                            </div>
 
+                            <div id="champ_vs_tile" runat="server" class="col-md-2 panel champion_tile champion_tile_last">
+                                <table class="fullwidth center">
+                                    <tr>
+                                        <td>
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
+                                            <div class="champion_name">
+                                                <asp:Label ID="ChampVsName" runat="server" Text="ChampVsName"></asp:Label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="champion_as_won won">W</div>
+                                            <div class="champion_as_total lost">T</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="champion_vs_won won">W</div>
+                                            <div class="champion_vs_total lost">T</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="#" class="last_match">Last match</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,7 +225,7 @@
                         
                         Note that since champion_panel has a set height, weird stuff will probably happen if you have more than 2 rows of tiles.--%>
 
-                    <%--<div id="example_champ" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
+                    <div id="example_champ" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
                         <table class="fullwidth center">
                             <tr>
                                 <td>
@@ -192,7 +251,7 @@
                                 </td>
                             </tr>
                         </table>
-                    </div>--%>
+                    </div>
                     </div>
                 </div>
 
