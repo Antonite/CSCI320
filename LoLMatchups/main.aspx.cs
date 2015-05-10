@@ -46,19 +46,19 @@ public partial class _Default : System.Web.UI.Page
 
         switch (div)
         {
-            case 'b': result += "Bronze ";
+            case 'B': result += "Bronze ";
                 break;
-            case 's': result += "Silver ";
+            case 'S': result += "Silver ";
                 break;
-            case 'g': result += "Gold ";
+            case 'G': result += "Gold ";
                 break;
-            case 'p': result += "Platinum ";
+            case 'P': result += "Platinum ";
                 break;
-            case 'd': result += "Diamond ";
+            case 'D': result += "Diamond ";
                 break;
-            case 'm': result += "Master ";
+            case 'M': result += "Master ";
                 break;
-            case 'c': result += "Challenger ";
+            case 'C': result += "Challenger ";
                 break;
             default: result = "Badly formatted rank";
                 break;
