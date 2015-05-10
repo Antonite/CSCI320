@@ -27,7 +27,6 @@ public partial class _Default : System.Web.UI.Page
         //itemImg1.Style.Add("display", "none");
         matchupStats.Text = "";
         matchupPercent.Text = "";
-        matchupTopItems.Text = "";
         matchupTopRunes.Text = "";
         matchupTopMasteries.Text = "";
         ChampAsName.Text = "";
@@ -35,7 +34,6 @@ public partial class _Default : System.Web.UI.Page
         matchupTopItemsPercent.Text = "";
         matchupTopRunesPercent.Text = "";
         matchupTopMasteriesPercent.Text = "";
-
         connection = connectToServer();
     }
 
@@ -252,16 +250,17 @@ public partial class _Default : System.Web.UI.Page
                 ChampAsName.Text = reader.GetString(0);
                 ChampVsName.Text = reader.GetString(1);
 
+                //fill item images
+                item1Path.Value = "ItemImages\\" + reader.GetString(4) + ".png";
+                item2Path.Value = "ItemImages\\" + reader.GetString(5) + ".png";
+                item3Path.Value = "ItemImages\\" + reader.GetString(6) + ".png";
+                item4Path.Value = "ItemImages\\" + reader.GetString(7) + ".png";
+                item5Path.Value = "ItemImages\\" + reader.GetString(8) + ".png";
+                item6Path.Value = "ItemImages\\" + reader.GetString(9) + ".png";
+                item7Path.Value = "ItemImages\\" + reader.GetString(10) + ".png";
                 
-                matchupTopItems.Text = reader.GetString(4) + ", " + 
-                                        reader.GetString(5) + ", " + 
-                                        reader.GetString(6) + ", " + 
-                                        reader.GetString(7) + ", " + 
-                                        reader.GetString(8) + ", " + 
-                                        reader.GetString(9) + ", " + 
-                                        reader.GetString(10);
-                matchupTopMasteries.Text = reader.GetString(13) + "...";
-                matchupTopRunes.Text = reader.GetString(18) + " ... " + reader.GetString(47);
+                //matchupTopMasteries.Text = reader.GetString(13) + "...";
+               // matchupTopRunes.Text = reader.GetString(18) + " ... " + reader.GetString(47);
 
 
 

@@ -85,7 +85,7 @@
                                 <table class="fullwidth center">
                                     <tr>
                                         <td>
-                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" />
                                             <div class="champion_name">
                                                 <asp:Label ID="ChampAsName" runat="server" Text="ChampAsName"></asp:Label>
                                             </div>
@@ -111,6 +111,15 @@
                                 </table>
                             </div>
                             
+
+                            <input  type="hidden" runat='server' id="item1Path" value="" />
+                            <input  type="hidden" runat='server' id="item2Path" value="" />
+                            <input  type="hidden" runat='server' id="item3Path" value="" />
+                            <input  type="hidden" runat='server' id="item4Path" value="" />
+                            <input  type="hidden" runat='server' id="item5Path" value="" />
+                            <input  type="hidden" runat='server' id="item6Path" value="" />
+                            <input  type="hidden" runat='server' id="item7Path" value="" />
+
                             <div id="matchup_info" class="col-md-8 panel">
                                 <table class="fullwidth center">
                                     <tr>
@@ -122,10 +131,9 @@
                                 <table class="fullwidth">
                                     <tr>
                                         <td>
-                                            <asp:Label ID="matchupTopItems" runat="server" Text="matchupTopItems"></asp:Label>
                                             <div class="container row" runat="server">
                                                 <div class="col-xs-1">
-                                                    Items:
+                                                    Items: <br /><asp:Label ID="matchupTopItemsPercent" runat="server" Text="matchupTopItemsPercent"></asp:Label>
                                                 </div>
                                                 <div class="col-xs-1 thumb" id="itemImg1">
                                                     <a class="thumbnail" href="#">
@@ -134,38 +142,36 @@
                                                 </div>
                                                 <div class="col-xs-1 thumb">
                                                     <a class="thumbnail" href="#">
-                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage2">
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-1 thumb">
                                                     <a class="thumbnail" href="#">
-                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage3">
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-1 thumb">
                                                     <a class="thumbnail" href="#">
-                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage4">
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-1 thumb">
                                                     <a class="thumbnail" href="#">
-                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage5">
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-1 thumb">
                                                     <a class="thumbnail" href="#">
-                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage6">
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-1 thumb">
                                                     <a class="thumbnail" href="#">
-                                                        <img class="img-responsive" src="http://placehold.it/50x50" alt="">
+                                                        <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage7">
                                                     </a>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
-                                            <asp:Label ID="matchupTopItemsPercent" runat="server" Text="matchupTopItemsPercent"></asp:Label></td>
                                     </tr>
                                     <tr>
                                         <td>Runes:</td>
