@@ -17,5 +17,21 @@ $("#itemImage7").attr("src", iPath7);
 function hideOtherPanels(panel_id)
 {
     $(".panel_lol").addClass("hide");
+    $("#matchup_panel").removeClass("hide");
     $(panel_id).removeClass("hide");
 }
+
+$(document).ready(function () {
+    $(".mastery-tile").each(function () {
+        var buffText = $(this).children(".mastery-desc").first().text();
+
+        $(this).on({
+            mouseenter: function () {
+                $("#mastery_buff").text(buffText);
+            },
+            mouseleave: function () {
+                $("#mastery_buff").text("Hover over a mastery icon to see its effect.");
+            },
+        })
+    });
+});

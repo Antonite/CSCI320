@@ -49,7 +49,7 @@
                             <td class="valign-bottom">
                                 <div id="summoner_navbar" class="navbar navbar-default summoner-navbar-lol">
                                     <ul class="nav navbar-nav">
-                                        <li><a id="summary_tab" href="#" onclick="hideOtherPanels('#summoner_panel')">Summary</a></li>
+                                        <li><a id="summary_tab" href="#" onclick="hideOtherPanels('#summary_panel')">Summary</a></li>
                                         <li><a id="champion_tab" href="#" onclick="hideOtherPanels('#champion_panel')">Champions</a></li>
                                         <li><a id="history_tab" href="#" onclick="hideOtherPanels('#history_panel')">Match History</a></li>
                                         <li><a id="rune_tab" href="#" onclick="hideOtherPanels('#rune_panel')">Runes</a></li>
@@ -223,6 +223,8 @@
                     </div>
                 </div>
 
+               <div id="summary_panel" runat="server" class="fullwidth panel panel_lol">Player Summary</div>
+
                <div id="champion_panel" runat="server" class="fullwidth panel panel_lol">
                     <div class="row">
                     <%--You can fit 6 champion_tile divs on one line. However, the overflow should occur automatically so you can 
@@ -262,11 +264,120 @@
                 </div>
 
 
-                <div id="history_panel" runat="server" class="fullwidth panel panel_lol">Detailed Match History</div>
-                <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">Detailed Rune Info</div>
-                <div id="mastery_panel" runat="server" class="fullwidth panel panel_lol">Detailed Mastery Info</div>
-                
-                </br>
+                <div id="history_panel" runat="server" class="fullwidth panel panel_lol">
+                    Detailed Match History
+                    <div class="row">
+                    </div>
+                </div>
+
+                <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            Example rune buff #1
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            Example rune buff #1
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mastery_panel" runat="server" class="fullwidth panel panel_lol">
+                    <div class="row">
+                        <div class="col-md-4 mastery-col">
+                            <div class="panel mastery-group mastery-offense">
+                            <div class="mastery-header">Offense</div>
+                            <div class="row">
+                                <div class="col-md-3 mastery-tile"">
+                                    <img src="blank.jpg" class="fullwidth fullheight"/>
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the first offensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight"/>
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the second offensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight"/>
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the third offensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight"/>
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the fourth offensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight"/>
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the fifth offensive mastery!</div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mastery-col">
+                            <div class="panel mastery-group mastery-group-defense">
+                            <div class="mastery-header">Defense</div>
+                            <div class="row">
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the first defensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the second defensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the third defensive mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the fourth defensive mastery!</div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mastery-col">
+                            <div class="panel mastery-group mastery-group-utility">
+                            <div class="mastery-header">Utility</div>
+                            <div class="row">
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the first utility mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the second utility mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the third utility mastery!</div>
+                                </div>
+                                <div class="col-md-3 mastery-tile">
+                                    <img src="blank.jpg" class="fullwidth fullheight" />
+                                    <div class="mastery-level">X/X</div>
+                                    <div class="mastery-desc">I'm the fourth utility mastery!</div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mastery-col">
+                            <div id="mastery_buff" class="panel mastery-buff-panel">
+                                Hover over a mastery icon to see its effect.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>

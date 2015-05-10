@@ -168,7 +168,8 @@ body {
 #matchup_info {
     font-size: 14px;
     background: #fff;
-    height: 238px;
+    
+    height: 266px;
     padding-top: 20px;
     padding-bottom: 25px;
     margin-right: 5px;
@@ -181,7 +182,99 @@ body {
     background: #fff;
 }
 
+/* Runes. */
+
+#rune_panel {
+    background: transparent;
+}
+
+.rune-tile {
+    margin-top: 0px;
+    margin-bottom: 15px;
+    padding: 15px;
+    font-size: 14px;
+}
+
+/* Masteries. */
+
+#mastery_panel{
+    background: transparent;
+}
+
+.mastery-col {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.mastery-group {
+    text-align: center;
+    padding: 20px;
+    padding-bottom: 0px;
+}
+
+.mastery-header {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.mastery-level {
+    position: absolute;
+    font-size: 12px;
+    float:left;
+    text-align: right;
+    padding: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+    color: #fff;
+    background-color: rgba(20, 20, 20, .8);
+    border-radius: 1px;
+    border-top-left-radius: 0;
+    bottom: 0;
+}
+
+.mastery-desc {
+    display: none;
+}
+
+.mastery-buff-panel {
+    padding: 15px;
+    font-size: 14px;
+}
+
+.mastery-group-offense {
+
+}
+
+.mastery-group-defense {
+
+}
+
+.mastery-group-utility {
+
+}
+
+.mastery-tile {
+    margin-bottom: 25px;
+}
+
+.mastery-tile-offense {
+
+}
+
+.mastery-tile-defense {
+
+}
+
+.mastery-tile-utility {
+
+}
+
 /*Bootstrap theme for LoLMatchups*/
+
+.col-md-lol {
+    padding-left: 4px;
+    padding-right: 4px;
+}
 
 .navbar-lol {
     padding-top: 7px;
@@ -231,7 +324,9 @@ body {
 .panel_lol {
     height: 600px;
     margin-top: 0px;
+    margin-bottom: 10px;
     padding: 20px;
+    padding-top: 0px;
     text-align: left;
     font-size: 24px;
     box-shadow: none;

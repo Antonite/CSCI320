@@ -21,9 +21,13 @@ public partial class _Default : System.Web.UI.Page
         status.Text = "";
         status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
-        champ_as.Style.Add("display", "none");
-        champ_vs.Style.Add("display", "none");
-        champ_button.Style.Add("display", "none");
+        //champ_as.Style.Add("display", "none");
+        //champ_vs.Style.Add("display", "none");
+        //champ_button.Style.Add("display", "none");
+
+        champ_button.Attributes.Add("disabled", "disabled");
+        matchup_panel.Style.Add("display", "none");
+
         //itemImg1.Style.Add("display", "none");
         matchupStats.Text = "";
         matchupPercent.Text = "";
@@ -126,9 +130,10 @@ public partial class _Default : System.Web.UI.Page
         {
             summoner_id.Text = "Summoner " + summoner_box.Text + " not found";
             summoner_id.Style.Add("display", "inline");
-            champ_as.Style.Add("display", "none");
-            champ_vs.Style.Add("display", "none");
-            champ_button.Style.Add("display", "none");
+            //champ_as.Style.Add("display", "none");
+            //champ_vs.Style.Add("display", "none");
+            //champ_button.Style.Add("display", "none");
+            champ_button.Attributes.Add("disabled", "disabled");
 
             connection.Close();
             return;
@@ -140,9 +145,10 @@ public partial class _Default : System.Web.UI.Page
         //reset input box
         //summoner_box.Text = "";
 
-        champ_as.Style.Add("display", "inline");
-        champ_vs.Style.Add("display", "inline");
-        champ_button.Style.Add("display", "inline");
+        //champ_as.Style.Add("display", "inline");
+        //champ_vs.Style.Add("display", "inline");
+        //champ_button.Style.Add("display", "inline");
+        champ_button.Attributes.Remove("disabled");
     }
 
     protected void getMatchups (object sender, EventArgs e)
@@ -263,7 +269,7 @@ public partial class _Default : System.Web.UI.Page
                // matchupTopRunes.Text = reader.GetString(18) + " ... " + reader.GetString(47);
 
 
-
+                matchup_panel.Style.Add("display", "block");
             }
             else
             {
