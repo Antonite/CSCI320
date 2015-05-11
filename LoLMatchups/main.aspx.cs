@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Configuration;
 using MySql.Data.MySqlClient;
+using System.Web.UI.HtmlControls;
 
 public partial class _Default : System.Web.UI.Page
 {
@@ -21,6 +22,7 @@ public partial class _Default : System.Web.UI.Page
         status.Text = "";
         status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
+        runeTable.Style.Add("display", "none");
         //champ_as.Style.Add("display", "none");
         //champ_vs.Style.Add("display", "none");
         //champ_button.Style.Add("display", "none");
@@ -38,14 +40,6 @@ public partial class _Default : System.Web.UI.Page
         matchupTopItemsPercent.Text = "";
         matchupTopRunesPercent.Text = "";
         matchupTopMasteriesPercent.Text = "";
-        runeBuff1.Text = "";
-        runeBuff2.Text = "";
-        runeBuff3.Text = "";
-        runeBuff4.Text = "";
-        runeBuff5.Text = "";
-        runeBuff6.Text = "";
-        runeBuff7.Text = "";
-        runeBuff8.Text = "";
         connection = connectToServer();
     }
 
@@ -362,6 +356,7 @@ public partial class _Default : System.Web.UI.Page
                     //remove additional parentheses
                     string[] refineSplit = effectType.Split(new char[] { '(' }, 2);
                     effectType = refineSplit[0].TrimEnd();
+                    effectType = char.ToUpper(effectType[0]) + effectType.Substring(1);
 
                     int runeCount = 0;
 
@@ -374,19 +369,33 @@ public partial class _Default : System.Web.UI.Page
 
                     
                 }
+
+                HtmlTableRow runeRow = new HtmlTableRow();
+                HtmlTableCell runeCell = new HtmlTableCell();
                 
-                //todo pass dict len to js to create dynamic divs
-                runeBuff1.Text = runeDict.Keys.ElementAt(0) + ": " + runeDict[runeDict.Keys.ElementAt(0)] + "";
-                //runeBuff2.Text = runeDict.Keys.ElementAt(1) + ": " + runeDict[runeDict.Keys.ElementAt(1)] + "";
-                //runeBuff3.Text = runeDict.Keys.ElementAt(2) + ": " + runeDict[runeDict.Keys.ElementAt(2)] + "";
-                //runeBuff4.Text = runeDict.Keys.ElementAt(3) + ": " + runeDict[runeDict.Keys.ElementAt(3)] + "";
-                //runeBuff5.Text = runeDict.Keys.ElementAt(4) + ": " + runeDict[runeDict.Keys.ElementAt(4)] + "";
-                //runeBuff6.Text = runeDict.Keys.ElementAt(5) + ": " + runeDict[runeDict.Keys.ElementAt(5)] + "";
-                //runeBuff7.Text = runeDict.Keys.ElementAt(6) + ": " + runeDict[runeDict.Keys.ElementAt(6)] + "";
-                //runeBuff8.Text = runeDict.Keys.ElementAt(7) + ": " + runeDict[runeDict.Keys.ElementAt(7)] + "";
+
+                foreach (String runeKey in runeDict.Keys)
+                {
+                    runeRow = new HtmlTableRow();
+
+                    //rune name
+                    runeCell = new HtmlTableCell();
+                    runeCell.InnerText = runeKey;
+                    runeRow.Cells.Add(runeCell);
 
 
-                //matchupTopRunesPercent.Text = runeDict["magic penetration"] + "";
+                    //total effect
+                    runeCell = new HtmlTableCell();
+                    runeCell.InnerText = runeDict[runeKey] + "";
+                    runeRow.Cells.Add(runeCell);
+
+                    runeTable.Rows.Add(runeRow);
+                  
+                }
+
+                
+                runeTable.Style.Add("display", "inline");
+                
             }
             else
             {

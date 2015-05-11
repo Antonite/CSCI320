@@ -283,45 +283,13 @@
                 </div>
 
                 <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff1" runat="server" Text="runeBuff1"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff2" runat="server" Text="runeBuff2"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff3" runat="server" Text="runeBuff3"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff4" runat="server" Text="runeBuff4"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff5" runat="server" Text="runeBuff5"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff6" runat="server" Text="runeBuff6"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff7" runat="server" Text="runeBuff7"></asp:Label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 panel rune-tile">
-                            <asp:Label ID="runeBuff8" runat="server" Text="runeBuff8"></asp:Label>
-                        </div>
+                    <div class="col-md-12 panel rune-tile">
+                        <Table ID="runeTable" class="table table-hover" runat="server">
+                              <tr>
+                                <th>Name</th>
+                                <th>Total Effect</th>
+                               </tr> 
+                        </Table>
                     </div>
                 </div>
 
