@@ -174,19 +174,31 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Runes:</td>
                                         <td>
-                                            <asp:Label ID="matchupTopRunes" runat="server" Text="matchupTopRunes"></asp:Label></td>
-                                        <td>
-                                            <asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label></td>
+                                            <div id="Div1" class="container row" runat="server">
+                                                <div class="col-xs-1">
+                                                    Runes:<br /><asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label>
+                                                </div>
+                                                <div class="col-xs-*">
+                                                    <a href="#">Rune page</a>
+                                                </div>
+                                            </div>
+                                       </td>
                                     </tr>
-                                    <tr>
-                                        <td>Masteries:</td>
+
+
+                                   <tr>
                                         <td>
-                                            <asp:Label ID="matchupTopMasteries" runat="server" Text="matchupTopMasteries"></asp:Label></td>
-                                        <td>
-                                            <asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label></td>
-                                    </tr>
+                                            <div id="Div2" class="container row" runat="server">
+                                                <div class="col-xs-1">
+                                                    Masteries:<br /><asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label>
+                                                </div>
+                                                <div class="col-xs-*">
+                                                    <a href="#">21-9-0(SAMPLE)</a>
+                                                </div>
+                                            </div>
+                                       </td>
+                                  </tr>
                                 </table>
                             </div>
 
@@ -273,12 +285,42 @@
                 <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">
                     <div class="row">
                         <div class="col-md-12 panel rune-tile">
-                            Example rune buff #1
+                            <asp:Label ID="runeBuff1" runat="server" Text="runeBuff1"></asp:Label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12 panel rune-tile">
-                            Example rune buff #1
+                            <asp:Label ID="runeBuff2" runat="server" Text="runeBuff2"></asp:Label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <asp:Label ID="runeBuff3" runat="server" Text="runeBuff3"></asp:Label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <asp:Label ID="runeBuff4" runat="server" Text="runeBuff4"></asp:Label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <asp:Label ID="runeBuff5" runat="server" Text="runeBuff5"></asp:Label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <asp:Label ID="runeBuff6" runat="server" Text="runeBuff6"></asp:Label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <asp:Label ID="runeBuff7" runat="server" Text="runeBuff7"></asp:Label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <asp:Label ID="runeBuff8" runat="server" Text="runeBuff8"></asp:Label>
                         </div>
                     </div>
                 </div>

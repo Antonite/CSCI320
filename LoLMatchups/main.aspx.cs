@@ -31,13 +31,21 @@ public partial class _Default : System.Web.UI.Page
         //itemImg1.Style.Add("display", "none");
         matchupStats.Text = "";
         matchupPercent.Text = "";
-        matchupTopRunes.Text = "";
-        matchupTopMasteries.Text = "";
+        //matchupTopRunes.Text = "";
+        //matchupTopMasteries.Text = "";
         ChampAsName.Text = "";
         ChampVsName.Text = "";
         matchupTopItemsPercent.Text = "";
         matchupTopRunesPercent.Text = "";
         matchupTopMasteriesPercent.Text = "";
+        runeBuff1.Text = "";
+        runeBuff2.Text = "";
+        runeBuff3.Text = "";
+        runeBuff4.Text = "";
+        runeBuff5.Text = "";
+        runeBuff6.Text = "";
+        runeBuff7.Text = "";
+        runeBuff8.Text = "";
         connection = connectToServer();
     }
 
@@ -266,7 +274,21 @@ public partial class _Default : System.Web.UI.Page
                 item7Path.Value = "ItemImages\\" + reader.GetString(10) + ".png";
                 
                 //matchupTopMasteries.Text = reader.GetString(13) + "...";
-               // matchupTopRunes.Text = reader.GetString(18) + " ... " + reader.GetString(47);
+               
+
+                string[] runeList = new string[30];
+                for (int i = 18; i < 48; i++)
+                {
+                    string aRune = reader.GetString(i);
+                    if (aRune == null) runeList[i - 18] = "0";
+                    else { runeList[i - 18] = aRune; }
+                    //matchupTopRunesPercent.Text += runeList[i - 18] + ",";
+                }
+
+                connection.Close();
+
+                processRunes(runeList);
+
 
 
                 matchup_panel.Style.Add("display", "block");
@@ -274,12 +296,14 @@ public partial class _Default : System.Web.UI.Page
             else
             {
                 matchupStats.Text = "No data found";
+                connection.Close();
             }
 
         }
         catch (Exception notFound)
         {
             matchupStats.Text = notFound.ToString();
+            connection.Close();
         }
     }
 
@@ -293,5 +317,90 @@ public partial class _Default : System.Web.UI.Page
         return connection;
     }
 
+
+
+    protected void processRunes(String[] runesIds)
+    {
+        Dictionary<string, double> runeDict = new Dictionary<string, double>();
+
+        MySqlDataReader reader;
+        //search for summoner, Dynamic SQL
+        MySqlCommand cmd = new MySqlCommand();
+        cmd.CommandText = "select * from lolmatchups.rune where rune.rune_id in (@r1,@r2,@r3,@r3,@r5,@r6,@r7,@r8,@r9,@r10,@r11,@r12,@r13,@r14,@r15,@r16,@r17,@r18,@r19,@r20,@r21,@r22,@r23,@r24,@r25,@r26,@r27,@r28,@r29,@r30)";
+        for (int i = 0; i < 30; i++)
+        {
+            cmd.Parameters.Add("@r" + (i+1), MySqlDbType.VarChar, 8);
+            cmd.Parameters["@r" + (i + 1)].Value = runesIds[i];
+        }
+
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+
+        //open connection
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+
+        //execute
+        try
+        {
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+
+                while (reader.Read())
+                {
+                    string runeid = reader.GetString(0);
+                    string runeEffect = reader.GetString(4);
+
+                    string[] split = runeEffect.Split(new char[] {' '}, 2);
+                    
+                    string effectType = split[1].TrimStart();
+                    string effectAmount = split[0].Substring(1, split[0].Length-1);
+
+                    if (effectAmount.EndsWith("%")) effectAmount = effectAmount.Substring(0, split[0].Length - 2);
+
+                    //remove additional parentheses
+                    string[] refineSplit = effectType.Split(new char[] { '(' }, 2);
+                    effectType = refineSplit[0].TrimEnd();
+
+                    int runeCount = 0;
+
+                    foreach (string aRune in runesIds)
+                    {
+                        if (aRune.Equals(runeid)) runeCount++;
+                    }
+                    runeDict.Add(effectType, runeCount * Double.Parse(effectAmount));
+
+
+                    
+                }
+                
+                //todo pass dict len to js to create dynamic divs
+                runeBuff1.Text = runeDict.Keys.ElementAt(0) + ": " + runeDict[runeDict.Keys.ElementAt(0)] + "";
+                //runeBuff2.Text = runeDict.Keys.ElementAt(1) + ": " + runeDict[runeDict.Keys.ElementAt(1)] + "";
+                //runeBuff3.Text = runeDict.Keys.ElementAt(2) + ": " + runeDict[runeDict.Keys.ElementAt(2)] + "";
+                //runeBuff4.Text = runeDict.Keys.ElementAt(3) + ": " + runeDict[runeDict.Keys.ElementAt(3)] + "";
+                //runeBuff5.Text = runeDict.Keys.ElementAt(4) + ": " + runeDict[runeDict.Keys.ElementAt(4)] + "";
+                //runeBuff6.Text = runeDict.Keys.ElementAt(5) + ": " + runeDict[runeDict.Keys.ElementAt(5)] + "";
+                //runeBuff7.Text = runeDict.Keys.ElementAt(6) + ": " + runeDict[runeDict.Keys.ElementAt(6)] + "";
+                //runeBuff8.Text = runeDict.Keys.ElementAt(7) + ": " + runeDict[runeDict.Keys.ElementAt(7)] + "";
+
+
+                //matchupTopRunesPercent.Text = runeDict["magic penetration"] + "";
+            }
+            else
+            {
+                matchupStats.Text = "No data found";
+            }
+
+        }
+        catch (Exception notFound)
+        {
+            matchupStats.Text = notFound.ToString();
+            connection.Close();
+        }
+        connection.Close();
+        
+    }
 
 }
