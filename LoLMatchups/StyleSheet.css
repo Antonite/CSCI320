@@ -395,6 +395,69 @@ body {
     border-top: 0;
 }
 
+/* Splash page specific */
+.navbar-splash {
+
+}
+
+.upper-splash {
+
+}
+
+.splash-panel {
+    margin-top: 220px;
+    background: transparent;
+    box-shadow: none;
+    padding: 15px;
+}
+
+.fa-splash {
+    width: 100px;
+    height: 100px;
+    padding-top: 20px;
+    text-align: center;
+    margin: 20px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    font-size: 50px;
+    transition: border-color .2s;
+}
+
+.fa-splash:hover {
+    border-color: #fff;
+}
+
+.splash-text {
+    font-weight: 300;
+    text-align: center;
+}
+
+.splash-subhead {
+    font-size: 20px;
+}
+
+.splash-body {
+    margin-left: 60px;
+    margin-right: 60px;
+    width: auto;
+    font-weight: 300;
+    font-size: 14px;
+    color: #888;
+}
+
+.text-splash-lol {
+    border: 0;
+    height: 50px;
+}
+
+.btn-splash-lol {
+    border: 0;
+    height: 50px;
+    width: 50px;
+    background: #f44336;
+    color: #fff;
+}
+
 /* Animation? */
 @keyframes fadein {
     from { opacity: 0; }
