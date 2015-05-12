@@ -36,9 +36,11 @@ CREATE TABLE `mastery` (
   `description_rank4` varchar(100) DEFAULT NULL,
   `tree` varchar(10) NOT NULL,
   `index` tinyint(3) unsigned NOT NULL,
+  `image_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`mastery_id`),
   UNIQUE KEY `mastery_id_UNIQUE` (`mastery_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `player` (
   `summoner_id` int(10) unsigned NOT NULL,

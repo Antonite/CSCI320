@@ -66,9 +66,7 @@ def generateItemInsert():
         
         item_image_url = "http://ddragon.leagueoflegends.com/cdn/5.2.1/img/item/" + item_data["image"]["full"]
         
-        print( item_image_url )
         if ( item_id != "3751" and item_id != "3286" and item_id != "3285" ):
-            print( item_id )
             f = open( "LoLMatchups/ItemImages/" + item_data["image"]["full"],'wb')
             f.write(urllib.request.urlopen( item_image_url ).read())
             f.close()
@@ -144,6 +142,11 @@ def generateMasteryInsert():
     
     output_values = ""
     for ( mastery_id, mastery_data ) in mastery_json.items():
+        mastery_image_url = "http://ddragon.leagueoflegends.com/cdn/5.2.1/img/mastery/" + str( mastery_id ) + ".png"
+        f = open( "LoLMatchups/MasteryImages/" + str( mastery_id ) + ".png", 'wb' )
+        f.write(urllib.request.urlopen( mastery_image_url ).read() )
+        f.close()
+        
         if len( output_values ) != 0:
             output_values += ",\n"
         output_values += "(" + mastery_id + ",\"" + mastery_data["name"] + "\","
@@ -175,7 +178,7 @@ def generateMasteryInsert():
         else:
             print( "Unknown outer_tree_index value: " + outer_tree_index )
 
-        output_values += str( inner_tree_index ) + ")"
+        output_values += str( inner_tree_index ) + ",\"" + str( mastery_id ) + ".png\")"
 
     f = open( TARGET_DIR + "/mastery_insert.sql", 'w' )
     f.write( output + output_values + ";" )
