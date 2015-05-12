@@ -18,17 +18,12 @@ public partial class _Default : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        // Disable the matchup-specific tabs.
-        rune_tab.Attributes.Add("onclick", "");
-        mastery_tab.Attributes.Add("onclick", "");
 
         summoner_id.Text = "";
         status.Text = "";
         status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
         runeTable.Style.Add("display", "none");
-
-        
 
         champ_button.Attributes.Add("disabled", "disabled");
         matchup_panel.Style.Add("display", "none");
@@ -151,10 +146,8 @@ public partial class _Default : System.Web.UI.Page
         //reset input box
         //summoner_box.Text = "";
 
-        // Disable the matchup-specific tabs.
-        rune_tab.Attributes.Add("onclick", "");
-        mastery_tab.Attributes.Add("onclick", "");
-
+        rune_panel.Attributes.Add("class", "fullwidth panel panel-lol noshadow hide");
+        mastery_panel.Attributes.Add("class", "fullwidth panel panel-lol noshadow hide");
         champ_button.Attributes.Remove("disabled");
     }
 
@@ -303,10 +296,8 @@ public partial class _Default : System.Web.UI.Page
                 //fill the runes pages
                 processRunes(runeList);
 
-                // Enable the matchup-specific tabs.
-                rune_tab.Attributes.Add("onclick", "hideOtherPanels('#rune_panel')");
-                mastery_tab.Attributes.Add("onclick", "hideOtherPanels('#mastery_panel')");
-
+                rune_panel.Attributes.Add("class", "fullwidth panel panel-lol noshadow");
+                mastery_panel.Attributes.Add("class", "fullwidth panel panel-lol noshadow");
                 matchup_panel.Style.Add("display", "block");
             }
             else
@@ -503,8 +494,8 @@ public partial class _Default : System.Web.UI.Page
                   
                 }
 
-                
-                runeTable.Style.Add("display", "block");
+
+                runeTable.Style.Remove("display");
             }
             else
             {

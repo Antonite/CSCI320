@@ -5,6 +5,7 @@
 <html>
 <head runat="server">
     <script src="//code.jquery.com/jquery-1.11.2.min.js" type="text/javascript"></script>
+    <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js" type="text/javascript"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type="text/css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -39,7 +40,7 @@
                         <tr>
                             <td class="valign-top">
                                 <%--<div id="sum_avatar" runat="server" class="avatar"></div>--%>
-                                <img id="sum_avatar" runat="server" src="ProfileImages\ProfileIcon01.jpg" class="avatar"/>
+                                <img id="sum_avatar" runat="server" src="ProfileImages/ProfileIcon01.jpg" class="avatar"/>
                                 <div id="sum_name" runat="server" class="summoner-name">Summoner Name</div>
                                 <div id="sum_rank" runat="server" class="summoner-rank">Rank</div>
                                 <div id="sum_winrate" runat="server" class="summoner-winrate">W / L</div>
@@ -49,11 +50,8 @@
                             <td class="valign-bottom">
                                 <div id="summoner_navbar" class="navbar navbar-default summoner-navbar-lol">
                                     <ul class="nav navbar-nav">
-                                        <li><a id="summary_tab" href="#" onclick="hideOtherPanels('#summary_panel')">Summary</a></li>
-                                        <li><a id="champion_tab" href="#" onclick="hideOtherPanels('#champion_panel')">Champions</a></li>
-                                        <li><a id="history_tab" href="#" onclick="hideOtherPanels('#history_panel')">Match History</a></li>
-                                        <li><a id="rune_tab" href="#" onclick="hideOtherPanels('#rune_panel')">Runes</a></li>
-                                        <li><a id="mastery_tab" href="#" onclick="hideOtherPanels('#mastery_panel')">Masteries</a></li>
+                                        <li><a id="summary_tab" runat="server" href="#" onclick="hideOtherPanels('#summary_panel')">Summary</a></li>
+                                        <li><a id="champion_tab" runat="server" href="#" onclick="hideOtherPanels('#champion_panel')">Champions</a></li>
                                     </ul>
                                 </div>
                             </td>
@@ -79,23 +77,23 @@
                 <div id="matchup_panel" runat="server" class="fullwidth panel panel_lol">
                     <div id="matchupStatsPanel">
                         <asp:Label ID="matchupStats" runat="server" Text="matchupStats"></asp:Label>
-                      
-                        <input  type="hidden" runat='server' id="item1Path" value="" />
-                        <input  type="hidden" runat='server' id="item2Path" value="" />
-                        <input  type="hidden" runat='server' id="item3Path" value="" />
-                        <input  type="hidden" runat='server' id="item4Path" value="" />
-                        <input  type="hidden" runat='server' id="item5Path" value="" />
-                        <input  type="hidden" runat='server' id="item6Path" value="" />
-                        <input  type="hidden" runat='server' id="item7Path" value="" />
-                        <input  type="hidden" runat='server' id="championAsPath" value="" />
-                        <input  type="hidden" runat='server' id="championVsPath" value="" />
+
+                        <input type="hidden" runat='server' id="item1Path" value="" />
+                        <input type="hidden" runat='server' id="item2Path" value="" />
+                        <input type="hidden" runat='server' id="item3Path" value="" />
+                        <input type="hidden" runat='server' id="item4Path" value="" />
+                        <input type="hidden" runat='server' id="item5Path" value="" />
+                        <input type="hidden" runat='server' id="item6Path" value="" />
+                        <input type="hidden" runat='server' id="item7Path" value="" />
+                        <input type="hidden" runat='server' id="championAsPath" value="" />
+                        <input type="hidden" runat='server' id="championVsPath" value="" />
 
                         <div class="row">
                             <div id="champ_as_tile" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
                                 <table class="fullwidth center">
                                     <tr>
                                         <td>
-                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" id="champAsImage"/>
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" id="champAsImage" />
                                             <div class="champion_name">
                                                 <asp:Label ID="ChampAsName" runat="server" Text="ChampAsName"></asp:Label>
                                             </div>
@@ -103,96 +101,106 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_as_won won"><div class="champion_as_won won"> <asp:Label ID="winPercentAsLeft" runat="server" Text="winPercentAsLeft"></asp:Label></div></div>
+                                            <div class="champion_as_won won">
+                                                <div class="champion_as_won won">
+                                                    <asp:Label ID="winPercentAsLeft" runat="server" class="winrate" Text="winPercentAsLeft"></asp:Label></div>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_vs_won won"><div class="champion_vs_won won"> <asp:Label ID="winPercentVsLeft" runat="server" Text="winPercentVsLeft"></asp:Label></div></div>
+                                            <div class="champion_vs_won won">
+                                                <div class="champion_vs_won won">
+                                                    <asp:Label ID="winPercentVsLeft" runat="server" class="winrate" Text="winPercentVsLeft"></asp:Label></div>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
                             </div>
 
                             <div id="matchup_info" class="col-md-8 panel">
-                                <table class="fullwidth center">
+                                <table class="fullwidth fullheight">
                                     <tr>
                                         <td>
-                                            <asp:Label ID="matchupPercent" runat="server" Text="matchupPercent"></asp:Label>
+                                <div class="row center">
+                                    <div class="col-md-3 matchup-header">Matchup winrate</div>
+                                    <div class="col-md-3 matchup-header">Items</div>
+                                    <div class="col-md-3 matchup-header"><a href="matchup_panel">Runes</a></div>
+                                    <div class="col-md-3 matchup-header"><a href="#mastery_panel">Masteries</a></div>
+                                </div>
+
+                                            <div class="row center">
+                                                <div class="col-md-3">
+                                                    <asp:Label ID="matchupPercent" class="winrate winrate-lg" runat="server" Text="matchupPercent"></asp:Label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <asp:Label ID="matchupTopItemsPercent" class="winrate winrate-lg" runat="server" Text="matchupTopItemsPercent"></asp:Label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <asp:Label ID="matchupTopRunesPercent" class="winrate winrate-lg" runat="server" Text="matchupTopRunesPercent"></asp:Label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <asp:Label ID="matchupTopMasteriesPercent" class="winrate winrate-lg" runat="server" Text="matchupTopMasteriesPercent"></asp:Label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row center">
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-3"></div>
+                                                <div class="col-md-3">
+                                                    <div id="topMasteriesDiv" runat="server">
+                                                        <div>21-9-0</div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
-                                </table>
-                                <table class="fullwidth">
-                                    <tr>
+                                    <tr class="valign-bottom">
                                         <td>
-                                            <div class="container row" runat="server">
-                                                <div class="col-xs-1">
-                                                    Items: <br /><asp:Label ID="matchupTopItemsPercent" runat="server" Text="matchupTopItemsPercent"></asp:Label>
-                                                </div>
-                                                <div class="col-xs-1 thumb" id="itemImg1">
+                                            <div class="row center">
+                                                <div class="col-xs-1 col-xs-lol thumb" id="itemImg1">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage1">
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 thumb">
+                                                <div class="col-xs-1 col-xs-lol thumb">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage2">
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 thumb">
+                                                <div class="col-xs-1 col-xs-lol thumb">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage3">
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 thumb">
+                                                <div class="col-xs-1 col-xs-lol thumb">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage4">
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 thumb">
+                                                <div class="col-xs-1 col-xs-lol thumb">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage5">
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 thumb">
+                                                <div class="col-xs-1 col-xs-lol thumb">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage6">
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 thumb">
+                                                <div class="col-xs-1 col-xs-lol thumb">
                                                     <a class="thumbnail" href="#">
                                                         <img class="img-responsive" src="http://placehold.it/50x50" id="itemImage7">
                                                     </a>
                                                 </div>
+                                                <div class="col-xs-1 col-xs-lol thumb"></div>
+                                                <div id="topRunesDiv" class="col-xs-1 col-xs-lol" runat="server">
+                                                    <%-- <a href="#">Rune page</a> --%>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div id="topRunesDiv" class="container row" runat="server">
-                                                <div class="col-xs-1">
-                                                    Runes:<br /><asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label>
-                                                </div>
-                                                <div class="col-xs-*">
-                                                    <a href="#">Rune page</a>
-                                                </div>
-                                            </div>
-                                       </td>
-                                    </tr>
-
-
-                                   <tr>
-                                        <td>
-                                            <div id="topMasteriesDiv" class="container row" runat="server">
-                                                <div class="col-xs-1">
-                                                    Masteries:<br /><asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label>
-                                                </div>
-                                                <div class="col-xs-*">
-                                                    <a href="#">21-9-0(SAMPLE)</a>
-                                                </div>
-                                            </div>
-                                       </td>
-                                  </tr>
                                 </table>
                             </div>
 
@@ -200,7 +208,7 @@
                                 <table class="fullwidth center">
                                     <tr>
                                         <td>
-                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" id="champVsImage"/>
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" id="champVsImage" />
                                             <div class="champion_name">
                                                 <asp:Label ID="ChampVsName" runat="server" Text="ChampVsName"></asp:Label>
                                             </div>
@@ -208,12 +216,14 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_as_won won"> <asp:Label ID="winPercentAsRight" runat="server" Text="winPercentAsRight"></asp:Label></div>
+                                            <div class="champion_as_won won">
+                                                <asp:Label ID="winPercentAsRight" class="winrate" runat="server" Text="winPercentAsRight"></asp:Label></div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_vs_won won"> <asp:Label ID="winPercentVsRight" runat="server" Text="winPercentVsRight"></asp:Label></div>
+                                            <div class="champion_vs_won won">
+                                                <asp:Label ID="winPercentVsRight" class="winrate" runat="server" Text="winPercentVsRight"></asp:Label></div>
                                         </td>
                                     </tr>
                                 </table>
@@ -221,62 +231,69 @@
                         </div>
                     </div>
                 </div>
+                
+                <%-- 
+                <div class="winrate">0%</div>
+                <div class="winrate">10%</div>
+                <div class="winrate">20%</div>
+                <div class="winrate">30%</div>
+                <div class="winrate">50%</div>
+                <div class="winrate">60%</div>
+                <div class="winrate">70%</div>
+                <div class="winrate">80%</div>
+                <div class="winrate">90%</div>
+                <div class="winrate">100%</div>--%>
 
-               <div id="summary_panel" runat="server" class="fullwidth panel panel_lol">Player Summary</div>
+                <%-- <div id="summary_panel" runat="server" class="fullwidth panel panel_lol">Player Summary</div> --%>
 
-               <div id="champion_panel" runat="server" class="fullwidth panel panel_lol">
+                <div id="champion_panel" runat="server" class="fullwidth panel panel_lol">
                     <div class="row">
-                    <%--You can fit 6 champion_tile divs on one line. However, the overflow should occur automatically so you can 
+                        <%--You can fit 6 champion_tile divs on one line. However, the overflow should occur automatically so you can 
                         just drop all of the divs into this row div. For the 1st and 6th tiles in every row, you need to subclass
                         it with champion_tile_first or champion_tile_last so that the margins don't get messed up.
                         
                         Note that since champion_panel has a set height, weird stuff will probably happen if you have more than 2 rows of tiles.--%>
 
-                    <div id="example_champ" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
-                        <table class="fullwidth center">
-                            <tr>
-                                <td>
-                                    <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
-                                    <div class="champion_name">Champ Name</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="champion_as_won won">W</div>
-                                    <div class="champion_as_total lost">T</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="champion_vs_won won">W</div>
-                                    <div class="champion_vs_total lost">T</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <a href="#" class=last_match>Last match</a>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    </div>
-                </div>
-
-
-                <div id="history_panel" runat="server" class="fullwidth panel panel_lol">
-                    Detailed Match History
-                    <div class="row">
+                        <div id="example_champ" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
+                            <table class="fullwidth center">
+                                <tr>
+                                    <td>
+                                        <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
+                                        <div class="champion_name">Champ Name</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="champion_as_won won">W</div>
+                                        <div class="champion_as_total lost">T</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="champion_vs_won won">W</div>
+                                        <div class="champion_vs_total lost">T</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <a href="#" class="last_match">Last match</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
                 <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">
-                    <div class="col-md-12 panel rune-tile">
-                        <Table ID="runeTable" class="table table-hover" runat="server">
-                              <tr>
-                                <th>Name</th>
-                                <th>Total Effect</th>
-                               </tr> 
-                        </Table>
+                    <div class="row">
+                        <div class="col-md-12 panel rune-tile">
+                            <table id="runeTable" class="table table-hover fullwidth" runat="server">
+                                <tr>
+                                    <th>Rune effect</th>
+                                    <th>Aggregate buff</th>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
