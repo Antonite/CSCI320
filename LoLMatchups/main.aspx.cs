@@ -18,14 +18,17 @@ public partial class _Default : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        // Disable the matchup-specific tabs.
+        rune_tab.Attributes.Add("onclick", "");
+        mastery_tab.Attributes.Add("onclick", "");
+
         summoner_id.Text = "";
         status.Text = "";
         status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
         runeTable.Style.Add("display", "none");
-        //champ_as.Style.Add("display", "none");
-        //champ_vs.Style.Add("display", "none");
-        //champ_button.Style.Add("display", "none");
+
+        
 
         champ_button.Attributes.Add("disabled", "disabled");
         matchup_panel.Style.Add("display", "none");
@@ -136,9 +139,6 @@ public partial class _Default : System.Web.UI.Page
         {
             summoner_id.Text = "Summoner " + summoner_box.Text + " not found";
             summoner_id.Style.Add("display", "inline");
-            //champ_as.Style.Add("display", "none");
-            //champ_vs.Style.Add("display", "none");
-            //champ_button.Style.Add("display", "none");
             champ_button.Attributes.Add("disabled", "disabled");
 
             connection.Close();
@@ -151,9 +151,10 @@ public partial class _Default : System.Web.UI.Page
         //reset input box
         //summoner_box.Text = "";
 
-        //champ_as.Style.Add("display", "inline");
-        //champ_vs.Style.Add("display", "inline");
-        //champ_button.Style.Add("display", "inline");
+        // Disable the matchup-specific tabs.
+        rune_tab.Attributes.Add("onclick", "");
+        mastery_tab.Attributes.Add("onclick", "");
+
         champ_button.Attributes.Remove("disabled");
     }
 
@@ -255,7 +256,7 @@ public partial class _Default : System.Web.UI.Page
                 float runesWinPercent = reader.GetFloat(48) / reader.GetFloat(49) * 100;
                 float masteriesWinPercent = reader.GetFloat(16) / reader.GetFloat(17) * 100;
 
-                matchupPercent.Text = "Matchup Winrate: " + totalWinPercent + "%";
+                matchupPercent.Text = totalWinPercent + "%";
                 matchupTopItemsPercent.Text = itemsWinPercent + "%";
                 matchupTopRunesPercent.Text = runesWinPercent + "%";
                 matchupTopMasteriesPercent.Text = masteriesWinPercent + "%";
@@ -302,7 +303,9 @@ public partial class _Default : System.Web.UI.Page
                 //fill the runes pages
                 processRunes(runeList);
 
-
+                // Enable the matchup-specific tabs.
+                rune_tab.Attributes.Add("onclick", "hideOtherPanels('#rune_panel')");
+                mastery_tab.Attributes.Add("onclick", "hideOtherPanels('#mastery_panel')");
 
                 matchup_panel.Style.Add("display", "block");
             }
@@ -501,8 +504,7 @@ public partial class _Default : System.Web.UI.Page
                 }
 
                 
-                runeTable.Style.Add("display", "inline");
-                
+                runeTable.Style.Add("display", "block");
             }
             else
             {
@@ -516,7 +518,5 @@ public partial class _Default : System.Web.UI.Page
             connection.Close();
         }
         connection.Close();
-        
     }
-
 }
