@@ -178,7 +178,7 @@ def generateMasteryInsert():
         else:
             print( "Unknown outer_tree_index value: " + outer_tree_index )
 
-        output_values += str( inner_tree_index ) + ",\"" + str( mastery_id ) + ".png\")"
+        output_values += str( inner_tree_index ) + ",\"MasteryImages/" + str( mastery_id ) + ".png\")"
 
     f = open( TARGET_DIR + "/mastery_insert.sql", 'w' )
     f.write( output + output_values + ";" )
