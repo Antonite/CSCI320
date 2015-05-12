@@ -5,6 +5,8 @@ var iPath4 = document.getElementById("item4Path").value;
 var iPath5 = document.getElementById("item5Path").value;
 var iPath6 = document.getElementById("item6Path").value;
 var iPath7 = document.getElementById("item7Path").value;
+var cPathAs = document.getElementById("championAsPath").value;
+var cPathVs = document.getElementById("championVsPath").value;
 
 $("#itemImage1").attr("src", iPath1);
 $("#itemImage2").attr("src", iPath2);
@@ -13,6 +15,8 @@ $("#itemImage4").attr("src", iPath4);
 $("#itemImage5").attr("src", iPath5);
 $("#itemImage6").attr("src", iPath6);
 $("#itemImage7").attr("src", iPath7);
+$("#champAsImage").attr("src", cPathAs);
+$("#champVsImage").attr("src", cPathVs);
 
 function hideOtherPanels(panel_id)
 {

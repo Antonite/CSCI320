@@ -39,7 +39,7 @@
                         <tr>
                             <td class="valign-top">
                                 <%--<div id="sum_avatar" runat="server" class="avatar"></div>--%>
-                                <img id="sum_avatar" runat="server" src="http://placekitten.com/g/185/185" class="avatar"/>
+                                <img id="sum_avatar" runat="server" src="ProfileImages\ProfileIcon01.jpg" class="avatar"/>
                                 <div id="sum_name" runat="server" class="summoner-name">Summoner Name</div>
                                 <div id="sum_rank" runat="server" class="summoner-rank">Rank</div>
                                 <div id="sum_winrate" runat="server" class="summoner-winrate">W / L</div>
@@ -79,13 +79,23 @@
                 <div id="matchup_panel" runat="server" class="fullwidth panel panel_lol">
                     <div id="matchupStatsPanel">
                         <asp:Label ID="matchupStats" runat="server" Text="matchupStats"></asp:Label>
+                      
+                        <input  type="hidden" runat='server' id="item1Path" value="" />
+                        <input  type="hidden" runat='server' id="item2Path" value="" />
+                        <input  type="hidden" runat='server' id="item3Path" value="" />
+                        <input  type="hidden" runat='server' id="item4Path" value="" />
+                        <input  type="hidden" runat='server' id="item5Path" value="" />
+                        <input  type="hidden" runat='server' id="item6Path" value="" />
+                        <input  type="hidden" runat='server' id="item7Path" value="" />
+                        <input  type="hidden" runat='server' id="championAsPath" value="" />
+                        <input  type="hidden" runat='server' id="championVsPath" value="" />
 
                         <div class="row">
                             <div id="champ_as_tile" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
                                 <table class="fullwidth center">
                                     <tr>
                                         <td>
-                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" />
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" id="champAsImage"/>
                                             <div class="champion_name">
                                                 <asp:Label ID="ChampAsName" runat="server" Text="ChampAsName"></asp:Label>
                                             </div>
@@ -93,32 +103,16 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_as_won won">W</div>
-                                            <div class="champion_as_total lost">T</div>
+                                            <div class="champion_as_won won"><div class="champion_as_won won"> <asp:Label ID="winPercentAsLeft" runat="server" Text="winPercentAsLeft"></asp:Label></div></div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_vs_won won">W</div>
-                                            <div class="champion_vs_total lost">T</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <a href="#" class="last_match">Last match</a>
+                                            <div class="champion_vs_won won"><div class="champion_vs_won won"> <asp:Label ID="winPercentVsLeft" runat="server" Text="winPercentVsLeft"></asp:Label></div></div>
                                         </td>
                                     </tr>
                                 </table>
                             </div>
-                            
-
-                            <input  type="hidden" runat='server' id="item1Path" value="" />
-                            <input  type="hidden" runat='server' id="item2Path" value="" />
-                            <input  type="hidden" runat='server' id="item3Path" value="" />
-                            <input  type="hidden" runat='server' id="item4Path" value="" />
-                            <input  type="hidden" runat='server' id="item5Path" value="" />
-                            <input  type="hidden" runat='server' id="item6Path" value="" />
-                            <input  type="hidden" runat='server' id="item7Path" value="" />
 
                             <div id="matchup_info" class="col-md-8 panel">
                                 <table class="fullwidth center">
@@ -175,7 +169,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div id="Div1" class="container row" runat="server">
+                                            <div id="topRunesDiv" class="container row" runat="server">
                                                 <div class="col-xs-1">
                                                     Runes:<br /><asp:Label ID="matchupTopRunesPercent" runat="server" Text="matchupTopRunesPercent"></asp:Label>
                                                 </div>
@@ -189,7 +183,7 @@
 
                                    <tr>
                                         <td>
-                                            <div id="Div2" class="container row" runat="server">
+                                            <div id="topMasteriesDiv" class="container row" runat="server">
                                                 <div class="col-xs-1">
                                                     Masteries:<br /><asp:Label ID="matchupTopMasteriesPercent" runat="server" Text="matchupTopMasteriesPercent"></asp:Label>
                                                 </div>
@@ -206,7 +200,7 @@
                                 <table class="fullwidth center">
                                     <tr>
                                         <td>
-                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center"></img>
+                                            <img src="http://placekitten.com/g/150/150" class="champion_portrait center" id="champVsImage"/>
                                             <div class="champion_name">
                                                 <asp:Label ID="ChampVsName" runat="server" Text="ChampVsName"></asp:Label>
                                             </div>
@@ -214,19 +208,12 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_as_won won">W</div>
-                                            <div class="champion_as_total lost">T</div>
+                                            <div class="champion_as_won won"> <asp:Label ID="winPercentAsRight" runat="server" Text="winPercentAsRight"></asp:Label></div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <div class="champion_vs_won won">W</div>
-                                            <div class="champion_vs_total lost">T</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <a href="#" class="last_match">Last match</a>
+                                            <div class="champion_vs_won won"> <asp:Label ID="winPercentVsRight" runat="server" Text="winPercentVsRight"></asp:Label></div>
                                         </td>
                                     </tr>
                                 </table>

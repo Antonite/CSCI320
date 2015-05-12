@@ -37,6 +37,10 @@ public partial class _Default : System.Web.UI.Page
         //matchupTopMasteries.Text = "";
         ChampAsName.Text = "";
         ChampVsName.Text = "";
+        winPercentAsLeft.Text = "";
+        winPercentVsLeft.Text = "";
+        winPercentAsRight.Text = "";
+        winPercentVsRight.Text = "";
         matchupTopItemsPercent.Text = "";
         matchupTopRunesPercent.Text = "";
         matchupTopMasteriesPercent.Text = "";
@@ -155,6 +159,8 @@ public partial class _Default : System.Web.UI.Page
 
     protected void getMatchups (object sender, EventArgs e)
     {
+        string championAsName;
+        string championVsName;
         MySqlDataReader reader;
         //search for summoner, Dynamic SQL
         MySqlCommand cmd = new MySqlCommand();
@@ -254,9 +260,17 @@ public partial class _Default : System.Web.UI.Page
                 matchupTopRunesPercent.Text = runesWinPercent + "%";
                 matchupTopMasteriesPercent.Text = masteriesWinPercent + "%";
 
+                championAsName = reader.GetString(0);
+                championVsName = reader.GetString(1);
+
                 //fill in data for labels
-                ChampAsName.Text = reader.GetString(0);
-                ChampVsName.Text = reader.GetString(1);
+                ChampAsName.Text = championAsName;
+                ChampVsName.Text = championVsName;
+
+
+                //fill champion Images
+                championAsPath.Value = "ChampionImages\\" + championAsName + "_Square_0.png";
+                championVsPath.Value = "ChampionImages\\" + championVsName + "_Square_0.png";
 
                 //fill item images
                 item1Path.Value = "ItemImages\\" + reader.GetString(4) + ".png";
@@ -278,9 +292,14 @@ public partial class _Default : System.Web.UI.Page
                     else { runeList[i - 18] = aRune; }
                     //matchupTopRunesPercent.Text += runeList[i - 18] + ",";
                 }
+ 
 
                 connection.Close();
 
+                //fill chapion stats
+                fillChampStats(championAsName, championVsName);
+
+                //fill the runes pages
                 processRunes(runeList);
 
 
@@ -301,6 +320,7 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
+
     protected MySqlConnection connectToServer()
     {
         
@@ -309,6 +329,91 @@ public partial class _Default : System.Web.UI.Page
         MySqlConnection connection = new MySqlConnection(connectionString);
 
         return connection;
+    }
+
+
+
+    protected void fillChampStats(String nameAs, String nameVs)
+    {
+        MySqlDataReader reader;
+        //search for summoner, Dynamic SQL
+        MySqlCommand cmd = new MySqlCommand();
+
+        //fill percent total % champions
+        cmd = new MySqlCommand();
+        cmd.CommandText = "select champs.name, " +
+                            "stats.played_as_won, " +
+                            "stats.played_as_total, " +
+                            "stats.played_against_won, " +
+                            "stats.played_against_total " +
+            "from lolmatchups.player_champion_stat stats " +
+            "join lolmatchups.champion champs on stats.champion_id = champs.champion_id " +
+            "where stats.summoner_id = @id and champs.name in (@as, @vs)";
+        cmd.Parameters.Add("@as", MySqlDbType.VarChar, 32);
+        cmd.Parameters["@as"].Value = nameAs;
+        cmd.Parameters.Add("@vs", MySqlDbType.VarChar, 32);
+        cmd.Parameters["@vs"].Value = nameVs;
+        cmd.Parameters.Add("@id", MySqlDbType.VarChar, 8);
+        cmd.Parameters["@id"].Value = summonerId;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        
+
+        //open connection
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+
+        //execute
+        try
+        {
+            reader = cmd.ExecuteReader();
+
+            float winPercentAschamp;
+            float winPercentVschamp;
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+                if(reader.GetString(0).Equals(nameAs))
+                {
+                winPercentAschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
+                winPercentVschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
+                winPercentAsLeft.Text = winPercentAschamp + "%";
+                winPercentVsLeft.Text = winPercentVschamp + "%";
+                
+                reader.Read();
+                winPercentAschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
+                winPercentVschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
+                winPercentAsRight.Text = winPercentAschamp + "%";
+                winPercentVsRight.Text = winPercentVschamp + "%";
+                }
+                else
+                {
+                winPercentVschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
+                winPercentAschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
+                winPercentAsLeft.Text = winPercentAschamp + "%";
+                winPercentVsLeft.Text = winPercentVschamp + "%";
+                
+                reader.Read();
+                winPercentVschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
+                winPercentAschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
+                winPercentAsRight.Text = winPercentAschamp + "%";
+                winPercentVsRight.Text = winPercentVschamp + "%";
+                }
+            }
+            else
+            {
+                matchupStats.Text = "No data found";
+            }
+
+            connection.Close();
+        }
+        catch (Exception notFound)
+        {
+            matchupStats.Text = notFound.ToString();
+            connection.Close();
+        }
+
     }
 
 
@@ -356,6 +461,8 @@ public partial class _Default : System.Web.UI.Page
                     //remove additional parentheses
                     string[] refineSplit = effectType.Split(new char[] { '(' }, 2);
                     effectType = refineSplit[0].TrimEnd();
+
+                    //capitalize first letter
                     effectType = char.ToUpper(effectType[0]) + effectType.Substring(1);
 
                     int runeCount = 0;
