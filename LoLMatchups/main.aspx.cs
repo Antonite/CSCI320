@@ -3,22 +3,31 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.IO;
+using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Configuration;
 using MySql.Data.MySqlClient;
 using System.Web.UI.HtmlControls;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Diagnostics;
+using System.Web.Script.Serialization;
 
 public partial class _Default : System.Web.UI.Page
 {
     //todo case sensitivity
     private MySqlConnection connection;
     private static String summonerId;
+    private const String API_KEY = "e171bba5-29fa-41e8-a1af-2c82b601b947";
+
     protected void Page_Load(object sender, EventArgs e)
     {
         if (((String) HttpContext.Current.Session["summonerName"]) != "")
         {
+            updateDb( (String) HttpContext.Current.Session["summonerName"] );
             summoner_box.Text = (String) HttpContext.Current.Session["summonerName"];
             HttpContext.Current.Session["summonerName"] = "";
             submit(findSummoner, null);
@@ -111,6 +120,159 @@ public partial class _Default : System.Web.UI.Page
 
         return result;
     }
+
+    
+    protected string parseApiRank(string tier, string division) {
+        string rank_string = "";
+        switch (tier) { 
+            case "BRONZE": rank_string += "B";
+                break;
+            case "SILVER": rank_string += "S";
+                break;
+            case "GOLD": rank_string += "G";
+                break;
+            case "PLATINUM": rank_string += "P";
+                break;
+            case "DIAMOND": rank_string += "D";
+                break;
+        }
+        switch( division ){
+            case "I": rank_string += "1";
+                break;
+            case "II": rank_string += "2";
+                break;
+            case "III": rank_string += "3";
+                break;
+            case "IV": rank_string += "4";
+                break;
+            case "V": rank_string += "5";
+                break;
+        }
+        return rank_string;
+    }
+
+    protected int getMasteryIndex(int mastery_id) { 
+        int index = -1;
+        switch (mastery_id) { 
+            case 4111: index = 0;
+                break;
+            case 4112: index = 1;
+                break;
+            case 4113: index = 2;
+                break;
+            case 4114: index = 3;
+                break;
+            case 4121: index = 4;
+                break;
+            case 4122: index = 5;
+                break;
+            case 4123: index = 6;
+                break;
+            case 4124: index = 7;
+                break;
+            case 4131: index = 8;
+                break;
+            case 4132: index = 9;
+                break;
+            case 4133: index = 10;
+                break;
+            case 4134: index = 11;
+                break;
+            case 4141: index = 12;
+                break;
+            case 4142: index = 13;
+                break;
+            case 4143: index = 14;
+                break;
+            case 4144: index = 15;
+                break;
+            case 4151: index = 16;
+                break;
+            case 4152: index = 17;
+                break;
+            case 4154: index = 18;
+                break;
+            case 4162: index = 19;
+                break;
+            case 4211: index = 0;
+                break;
+            case 4212: index = 1;
+                break;
+            case 4213: index = 2;
+                break;
+            case 4214: index = 3;
+                break;
+            case 4221: index = 4;
+                break;
+            case 4222: index = 5;
+                break;
+            case 4224: index = 6;
+                break;
+            case 4231: index = 7;
+                break;
+            case 4232: index = 8;
+                break;
+            case 4233: index = 9;
+                break;
+            case 4234: index = 10;
+                break;
+            case 4241: index = 11;
+                break;
+            case 4242: index = 12;
+                break;
+            case 4243: index = 13;
+                break;
+            case 4244: index = 14;
+                break;
+            case 4251: index = 15;
+                break;
+            case 4252: index = 16;
+                break;
+            case 4253: index = 17;
+                break;
+            case 4262: index = 18;
+                break;
+            case 4311: index = 0;
+                break;
+            case 4312: index = 1;
+                break;
+            case 4313: index = 2;
+                break;
+            case 4314: index = 3;
+                break;
+            case 4322: index = 4;
+                break;
+            case 4323: index = 5;
+                break;
+            case 4324: index = 6;
+                break;
+            case 4331: index = 7;
+                break;
+            case 4332: index = 8;
+                break;
+            case 4333: index = 9;
+                break;
+            case 4334: index = 10;
+                break;
+            case 4341: index = 11;
+                break;
+            case 4342: index = 12;
+                break;
+            case 4343: index = 13;
+                break;
+            case 4344: index = 14;
+                break;
+            case 4352: index = 15;
+                break;
+            case 4353: index = 16;
+                break;
+            case 4362: index = 17;
+                break;
+        }
+        return index;
+    }
+
+
 
     protected void submit(object sender, EventArgs e)
     {
@@ -968,5 +1130,1832 @@ public partial class _Default : System.Web.UI.Page
             connection.Close();
         }
         connection.Close();
+    }
+
+    private void updateDb(String summoner_name)
+    {
+        MySqlDataReader reader;
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT player.summoner_id, player.name, player.last_update_match_id FROM lolmatchups.player WHERE lolmatchups.player.name = @name LIMIT 1";
+        cmd.Parameters.Add("@name", MySqlDbType.VarChar);
+        cmd.Parameters["@name"].Value = summoner_name;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+          
+        //open connection
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        
+        try { 
+            reader = cmd.ExecuteReader();
+            if (reader.HasRows) {
+                reader.Read();
+                int summoner_id = reader.GetInt32( 0 );
+                int last_match_id = reader.GetInt32( 2 );
+                int new_last_match_id;
+                connection.Close();
+
+                String url = "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/" + summoner_id.ToString() + "?rankedQueues=RANKED_SOLO_5x5,RANKED_TEAM_5x5&api_key=" + API_KEY;
+                MatchHistoryResponse json_response = new MatchHistoryResponse();
+                
+                HttpWebResponse response = executeApiRequest( url );
+                try { 
+                    Match[] mh_matches = json_response.matches;
+                    for (int i = 0; i < mh_matches.Length; i++) { 
+                        Match mh_match = mh_matches[i];
+                        if (mh_match.matchId == last_match_id) { 
+                            break;
+                        } else if (i == 0) { 
+                            new_last_match_id = mh_match.matchId;
+                        }
+                        Console.WriteLine( last_match_id.ToString() );
+                    }
+                } catch (Exception e) { Debug.WriteLine( e.Message ); }
+            } else {
+                connection.Close();
+                //Get summoner ID and build a simple match history
+                String summoner_url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summoner_name + "?api_key=" + API_KEY;
+                
+                HttpWebResponse response = executeApiRequest( summoner_url );
+                
+                Dictionary<string, SummonerInfo> json_response = new JavaScriptSerializer().Deserialize<Dictionary<string, SummonerInfo>>( new StreamReader( response.GetResponseStream() ).ReadToEnd() );
+
+                string stored_summoner_name = summoner_name.ToLower().Trim();
+                SummonerInfo s_info = json_response[stored_summoner_name];
+
+                String mh_url1 = "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/" + s_info.id + "?rankedQueues=RANKED_SOLO_5x5,RANKED_TEAM_5x5&api_key=" + API_KEY;
+                String mh_url2 = "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/" + s_info.id + "?rankedQueues=RANKED_SOLO_5x5,RANKED_TEAM_5x5&beginIndex=15&api_key=" + API_KEY;
+                HttpWebResponse mh_response1 = executeApiRequest( mh_url1 );
+                HttpWebResponse mh_response2 = executeApiRequest( mh_url2 );
+
+                List<PlayerReturnData> mh1 = parseMhResponse( mh_response1, s_info.id, 0 );
+                List<PlayerReturnData> mh2 = parseMhResponse( mh_response2, s_info.id, 0 );
+
+                int latest_match_id = mh1[0].match_id;
+
+                String league_url = "https://na.api.pvp.net/api/lol/na/v2.5/league/by-summoner/" + s_info.id + "/entry?api_key=" + API_KEY;
+                
+                HttpWebResponse league_response = executeApiRequest( league_url );
+                Dictionary<string, League[]> league_json_response = new JavaScriptSerializer().Deserialize<Dictionary<string, League[]>>( new StreamReader( league_response.GetResponseStream() ).ReadToEnd() );
+                
+                League[] summoner_leagues = league_json_response[s_info.id.ToString()];
+                string tier = "";
+                string division = "";
+                foreach (League league in summoner_leagues) {
+                    if (league.queue == "RANKED_SOLO_5x5") { 
+                        tier = league.tier;
+                        division = league.entries[0].division;
+                        break;
+                    }
+                }
+                
+                string rank_string = parseApiRank( tier, division );
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "INSERT INTO player VALUES (@sid, @name, @rank, @level, @last_update_match_id);";
+                cmd.Parameters.Add("@sid",MySqlDbType.UInt32);
+                cmd.Parameters["@sid"].Value = s_info.id;
+                cmd.Parameters.Add("@name",MySqlDbType.VarChar);
+                cmd.Parameters["@name"].Value = summoner_name;
+                cmd.Parameters.Add("@rank",MySqlDbType.VarChar);
+                cmd.Parameters["@rank"].Value = rank_string;
+                cmd.Parameters.Add("@level",MySqlDbType.UInt32);
+                cmd.Parameters["@level"].Value = s_info.summonerLevel;
+                cmd.Parameters.Add("@last_update_match_id",MySqlDbType.UInt32);
+                cmd.Parameters["@last_update_match_id"].Value = latest_match_id;
+                cmd.Connection = connection;
+                connection.Open();
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+                updateRows( mh1, s_info.id );
+                //return;
+                updateRows( mh2, s_info.id );
+            }
+        }catch( Exception e ){ Debug.WriteLine( e.ToString() ); }
+        
+    }
+
+    protected HttpWebResponse executeApiRequest( string url ) {
+        System.Threading.Thread.Sleep(1001);
+        try
+        {
+            HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new Exception(String.Format(
+                "Server error (HTTP {0}: {1}).",
+                response.StatusCode,
+                response.StatusDescription));
+            return response;
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(url);
+            Debug.WriteLine(e.Message);
+            return null;
+        }
+    }
+
+    protected List<PlayerReturnData> parseMhResponse(HttpWebResponse mh_response, int summoner_id, int last_match_id) { 
+        DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MatchHistoryResponse));
+        object objResponse = ser.ReadObject(mh_response.GetResponseStream());
+        MatchHistoryResponse mh_json = objResponse as MatchHistoryResponse;
+        Match[] matches = mh_json.matches;
+        List<PlayerReturnData> toReturn = new List<PlayerReturnData>();
+        foreach( Match match in matches ){
+            int current_match_id = match.matchId;
+            if( last_match_id != current_match_id ){
+                string match_url = "https://na.api.pvp.net/api/lol/na/v2.2/match/" + current_match_id.ToString() + "?api_key=" + API_KEY;
+                HttpWebResponse match_response = executeApiRequest( match_url );
+                PlayerReturnData matchup_data = parseMatchResponse( match_response, summoner_id );
+                toReturn.Add( matchup_data );
+            }
+        }
+        return toReturn;
+    }
+
+    protected PlayerReturnData parseMatchResponse(HttpWebResponse match_response, int summoner_id) { 
+        DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Match));
+        object objResponse = ser.ReadObject(match_response.GetResponseStream());
+        Match match_json = objResponse as Match;
+        
+        Participant[] participants = match_json.participants;
+        ParticipantIdentity[] participant_identities = match_json.participantIdentities;
+        int match_id = match_json.matchId;
+        string target_lane = "";
+        string target_role = "";
+        int target_team = 0;
+        int index = -1;
+        for( int i = 0; i < participants.Length; i++) { 
+            Participant participant = participants[i];
+            ParticipantIdentity p_id = participant_identities[i];
+            string lane = participant.timeline.lane;
+            string role = participant.timeline.role;
+            int p_summoner_id = p_id.player.summonerId;
+            int team_id = participant.teamId;
+            if (p_summoner_id == summoner_id) { 
+                target_lane = lane;
+                target_role = role;
+                target_team = team_id;
+                index = i;
+                break;
+            }
+        }
+        int op_index = -1;
+        for (int i = 0; i < participants.Length; i++) { 
+            if( index == i ){
+                continue;
+            }
+            Participant participant = participants[i];
+            ParticipantIdentity p_id = participant_identities[i];
+            string lane = participant.timeline.lane;
+            string role = participant.timeline.role;
+            int team_id = participant.teamId;
+            if (lane == target_lane) {
+                if (team_id != target_team) {
+                    if (role == target_role) { 
+                        op_index = i;
+                        break;
+                    }
+                }
+            }
+        }
+        if (op_index == -1) { 
+            //TODO not found condition
+            return null;
+        } else { 
+            Participant player_participant = participants[index];
+            Participant opp_participant = participants[op_index];
+            ParticipantIdentity p_id = participant_identities[index];
+            ParticipantIdentity opp_id = participant_identities[op_index];
+            
+            Stats stats = player_participant.stats;
+            Rune[] runes = player_participant.runes;
+            Mastery[] masteries = player_participant.masteries;
+            bool won = stats.winner;
+            //parse player runes
+            List<int> rune_list = new List<int>();
+            foreach (Rune rune in runes) { 
+                for( int i = 0; i < rune.rank; i++ ){
+                    rune_list.Add( rune.runeId );
+                }
+            }
+            rune_list.Sort();
+
+            //parse player masteries
+            int[] offense = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            int[] defense = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            int[] utility = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            foreach( Mastery mastery in masteries ){
+                int m_index = getMasteryIndex( mastery.masteryId );
+                if( mastery.masteryId > 4300 ){
+                    utility[m_index] = mastery.rank;
+                }else if( mastery.masteryId > 4200 ){
+                    defense[m_index] = mastery.rank;
+                }else{
+                    offense[m_index] = mastery.rank;
+                }
+            }
+            string off_str = "[";
+            string def_str = "[";
+            string util_str = "[";
+            foreach( int mastery_rank in offense ){
+                off_str += mastery_rank.ToString() + ",";
+            }
+            off_str = off_str.Remove( off_str.Length - 1 );
+            off_str += "]";
+            foreach( int mastery_rank in defense ){
+                def_str += mastery_rank.ToString() + ",";
+            }
+            def_str = def_str.Remove( def_str.Length - 1 );
+            def_str += "]";
+            foreach( int mastery_rank in utility ){
+                util_str += mastery_rank.ToString() + ",";
+            }
+            util_str = util_str.Remove( util_str.Length - 1);
+            util_str += "]";
+
+            //parse player items
+            List<int> items = new List<int>();
+            items.Add( stats.item0 );
+            items.Add( stats.item1 );
+            items.Add( stats.item2 );
+            items.Add( stats.item3 );
+            items.Add( stats.item4 );
+            items.Add( stats.item5 );
+            items.Add( stats.item6 );
+            items.Sort();
+            items.Reverse();
+
+            //parse player ss
+            List<int> ss = new List<int>();
+            ss.Add( player_participant.spell1Id );
+            ss.Add( player_participant.spell2Id );
+
+            //parse player stats
+            int kills = stats.kills;
+            int deaths = stats.deaths;
+            int assists = stats.assists;
+            int cs = stats.minionsKilled;
+            int p_champ_id = player_participant.championId;
+            int o_champ_id = opp_participant.championId;
+
+            PlayerReturnData toReturn = new PlayerReturnData();
+            toReturn.assists = assists;
+            toReturn.kills = kills;
+            toReturn.deaths = deaths;
+            toReturn.cs = cs;
+            toReturn.pChampId = p_champ_id;
+            toReturn.oChampId = o_champ_id;
+            toReturn.ss = ss;
+            toReturn.items = items;
+            toReturn.offense = off_str;
+            toReturn.defense = def_str;
+            toReturn.utility = util_str;
+            toReturn.runes = rune_list;
+            toReturn.won = won;
+            toReturn.match_id = match_id;
+            return toReturn;
+        }
+    }
+
+    protected void updateRows(List<PlayerReturnData> mh, int summoner_id ) { 
+        foreach (PlayerReturnData match in mh) {
+
+            updateChampStats( match, summoner_id );
+
+            MySqlCommand cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_matchup WHERE lolmatchups.player_matchup.summoner_id = @sid AND lolmatchups.player_matchup.player_champion_id = @pid AND lolmatchups.player_matchup.opponent_champion_id = @oid LIMIT 1";
+            cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+            cmd.Parameters["@sid"].Value = summoner_id;
+            cmd.Parameters.Add("@pid", MySqlDbType.Int32);
+            cmd.Parameters["@pid"].Value = match.pChampId;
+            cmd.Parameters.Add("@oid", MySqlDbType.Int32);
+            cmd.Parameters["@oid"].Value = match.oChampId;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+
+            //open connection
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+
+            MySqlDataReader reader = cmd.ExecuteReader();
+            
+            if (reader.HasRows) {
+                //matchup exists, altering
+                reader.Read();
+                int matchup_id = reader.GetInt32( 0 );
+                int won = reader.GetInt32( 4 );
+                int played = reader.GetInt32( 5 );
+                int kills = reader.GetInt32( 6 );
+                int deaths = reader.GetInt32( 7 );
+                int assists = reader.GetInt32( 8 );
+                int cs = reader.GetInt32( 9 );
+                connection.Close();
+                reader.Close();
+
+                if (match.won) won++;
+                played++;
+                kills += match.kills;
+                deaths += match.deaths;
+                assists += match.assists;
+                cs += match.cs;
+                
+                //update row
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE lolmatchups.player_matchup SET won=@won,played=@played,kills=@k,deaths=@d,assists=@a,cumulative_creep_score=@cs WHERE lolmatchups.player_matchup.summoner_id = @sid AND lolmatchups.player_matchup.player_champion_id = @pid AND lolmatchups.player_matchup.opponent_champion_id = @oid LIMIT 1";
+                cmd.Parameters.Add("@won", MySqlDbType.Int32);
+                cmd.Parameters["@won"].Value = won;
+                cmd.Parameters.Add("@played", MySqlDbType.Int32);
+                cmd.Parameters["@played"].Value = played;
+                cmd.Parameters.Add("@k", MySqlDbType.Int32);
+                cmd.Parameters["@k"].Value = kills;
+                cmd.Parameters.Add("@d", MySqlDbType.Int32);
+                cmd.Parameters["@d"].Value = deaths;
+                cmd.Parameters.Add("@a", MySqlDbType.Int32);
+                cmd.Parameters["@a"].Value = assists;
+                cmd.Parameters.Add("@cs", MySqlDbType.Int32);
+                cmd.Parameters["@cs"].Value = cs;
+                cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+                cmd.Parameters["@sid"].Value = summoner_id;
+                cmd.Parameters.Add("@pid", MySqlDbType.Int32);
+                cmd.Parameters["@pid"].Value = match.pChampId;
+                cmd.Parameters.Add("@oid", MySqlDbType.Int32);
+                cmd.Parameters["@oid"].Value = match.oChampId;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+
+                updateSS( match, summoner_id, matchup_id );
+                updateMasteries( match, summoner_id, matchup_id );
+                updateRunes( match, summoner_id, matchup_id );
+                updateItems( match, summoner_id, matchup_id );
+            } else { 
+                //no matchup exists
+                if( match.won ) insertMatchup( summoner_id, match.pChampId, match.oChampId, 1, 1, match.kills, match.deaths, match.assists, match.cs );
+                else insertMatchup( summoner_id, match.pChampId, match.oChampId, 0, 1, match.kills, match.deaths, match.assists, match.cs );
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "SELECT matchup_id FROM lolmatchups.player_matchup WHERE lolmatchups.player_matchup.summoner_id = @sid AND lolmatchups.player_matchup.player_champion_id = @pid AND lolmatchups.player_matchup.opponent_champion_id = @oid LIMIT 1";
+                cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+                cmd.Parameters["@sid"].Value = summoner_id;
+                cmd.Parameters.Add("@pid", MySqlDbType.Int32);
+                cmd.Parameters["@pid"].Value = match.pChampId;
+                cmd.Parameters.Add("@oid", MySqlDbType.Int32);
+                cmd.Parameters["@oid"].Value = match.oChampId;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+
+                try { connection.Open(); }
+                catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+
+                MySqlDataReader matchup_reader = cmd.ExecuteReader();
+                matchup_reader.Read();
+                int matchup_id = matchup_reader.GetInt32( 0 );
+                connection.Close();
+                
+                if( match.won ){
+                    insertMastery( matchup_id, match.offense, match.defense, match.utility, 1, 1, true );
+                    insertRunes( matchup_id, match.runes, 1, 1, true );
+                    insertItems( matchup_id, match.items, 1, 1, true );
+                    insertSS( matchup_id, match.ss, 1, 1, true );
+                }
+                else{
+                    insertMastery( matchup_id, match.offense, match.defense, match.utility, 0, 1, true );
+                    insertRunes( matchup_id, match.runes, 0, 1, true );
+                    insertItems( matchup_id, match.items, 0, 1, true );
+                    insertSS( matchup_id, match.ss, 1, 1, true );
+                }
+            }
+        }
+    }
+
+    protected void updateRunes(PlayerReturnData match, int summoner_id, int matchup_id) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT * FROM player_rune_set WHERE player_rune_set.matchup_id=@mid ";
+        for (int i = 1; i < match.runes.Count+1; i++) { 
+            cmd.CommandText += "AND rune_id" + i.ToString() + "=@r" + i.ToString() + " ";
+            cmd.Parameters.Add("@r"+i.ToString(), MySqlDbType.Int32);
+            cmd.Parameters["@r"+i.ToString()].Value = match.runes[i-1];
+        }
+        for (int i = match.runes.Count; i < 30; i++) { 
+            cmd.CommandText += "AND rune_id" + i.ToString() + " IS NULL ";
+        }
+        cmd.CommandText += "LIMIT 1;";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+
+        if (reader.HasRows) {
+            //mastery exists, altering
+            reader.Read();
+            int p_runes_id = reader.GetInt32( 0 );
+            int won = reader.GetInt32( 31 );
+            int played = reader.GetInt32( 32 );
+            connection.Close();
+            reader.Close();
+
+            if( match.won ) won++;
+            played++;
+
+            //update row
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "UPDATE player_rune_set SET won=@won,used=@played WHERE player_rune_set.player_rune_set_id=@pruneid";
+            cmd.Parameters.Add("@won", MySqlDbType.Int32);
+            cmd.Parameters["@won"].Value = won;
+            cmd.Parameters.Add("@played", MySqlDbType.Int32);
+            cmd.Parameters["@played"].Value = played;
+            cmd.Parameters.Add("@pruneid", MySqlDbType.Int32);
+            cmd.Parameters["@pruneid"].Value = p_runes_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_rune_set WHERE matchup_id=@mid LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pruneid = reader.GetInt32( 1 ); 
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM player_rune_set WHERE player_rune_set_id=@pruneid;";
+            cmd.Parameters.Add("@pruneid", MySqlDbType.Int32);
+            cmd.Parameters["@pruneid"].Value = best_pruneid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 31 );
+            int best_played = reader.GetInt32( 32 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_rune_set SET player_rune_set_id=@pruneid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pruneid",MySqlDbType.Int32);
+                cmd.Parameters["@pruneid"].Value = p_runes_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        } else { 
+            //create new ss, check if its better than the best
+            int won = 0;
+            int played = 1;
+            if( match.won ) won = 1;
+            insertRunes( matchup_id, match.runes, won, played, false );
+
+            //get this player_rune_set_id and check if its better than the current best
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM player_rune_set WHERE player_rune_set.matchup_id=@mid ";
+            for (int i = 1; i < match.runes.Count+1; i++) { 
+                cmd.CommandText += "AND rune_id" + i.ToString() + "=@r" + i.ToString() + " ";
+                cmd.Parameters.Add("@r"+i.ToString(), MySqlDbType.Int32);
+                cmd.Parameters["@r"+i.ToString()].Value = match.runes[i-1];
+            }
+            for (int i = match.runes.Count; i < 30; i++) { 
+                cmd.CommandText += "AND rune_id" + i.ToString() + " IS NULL ";
+            }
+            cmd.CommandText += "LIMIT 1;";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int p_runes_id = reader.GetInt32( 0 );
+            reader.Close();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_rune_set WHERE matchup_id=@mid LIMIT 1;";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pruneid = reader.GetInt32( 1 );
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_rune_set WHERE player_rune_set_id=@pruneid;";
+            cmd.Parameters.Add("@pruneid", MySqlDbType.Int32);
+            cmd.Parameters["@pruneid"].Value = best_pruneid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 31 );
+            int best_played = reader.GetInt32( 32 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_rune_set SET player_rune_set_id=@pruneid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pruneid",MySqlDbType.Int32);
+                cmd.Parameters["@pruneid"].Value = p_runes_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+    }
+
+    protected void updateItems(PlayerReturnData match, int summoner_id, int matchup_id) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT * FROM player_items WHERE player_items.matchup_id=@mid ";
+        if (match.items[0] != 0) { 
+            cmd.CommandText += "AND item_id1=@id1 ";
+            cmd.Parameters.Add("@id1", MySqlDbType.Int32);
+            cmd.Parameters["@id1"].Value = match.items[0];
+        } else { 
+            cmd.CommandText += "AND item_id1 IS NULL ";
+        }
+        if (match.items[1] != 0) { 
+            cmd.CommandText += "AND item_id2=@id2 ";
+            cmd.Parameters.Add("@id2", MySqlDbType.Int32);
+            cmd.Parameters["@id2"].Value = match.items[1];
+        } else { 
+            cmd.CommandText += "AND item_id2 IS NULL ";
+        }
+        if (match.items[2] != 0) { 
+            cmd.CommandText += "AND item_id3=@id3 ";
+            cmd.Parameters.Add("@id3", MySqlDbType.Int32);
+            cmd.Parameters["@id3"].Value = match.items[2];
+        } else { 
+            cmd.CommandText += "AND item_id3 IS NULL ";
+        }
+        if (match.items[3] != 0) { 
+            cmd.CommandText += "AND item_id4=@id4 ";
+            cmd.Parameters.Add("@id4", MySqlDbType.Int32);
+            cmd.Parameters["@id4"].Value = match.items[3];
+        } else { 
+            cmd.CommandText += "AND item_id4 IS NULL ";
+        }
+        if (match.items[4] != 0) { 
+            cmd.CommandText += "AND item_id5=@id5 ";
+            cmd.Parameters.Add("@id5", MySqlDbType.Int32);
+            cmd.Parameters["@id5"].Value = match.items[4];
+        } else { 
+            cmd.CommandText += "AND item_id5 IS NULL ";
+        }
+        if (match.items[5] != 0) { 
+            cmd.CommandText += "AND item_id6=@id6 ";
+            cmd.Parameters.Add("@id6", MySqlDbType.Int32);
+            cmd.Parameters["@id6"].Value = match.items[5];
+        } else { 
+            cmd.CommandText += "AND item_id6 IS NULL ";
+        }
+        if (match.items[6] != 0) { 
+            cmd.CommandText += "AND item_id7=@id7 ";
+            cmd.Parameters.Add("@id7", MySqlDbType.Int32);
+            cmd.Parameters["@id7"].Value = match.items[6];
+        } else { 
+            cmd.CommandText += "AND item_id7 IS NULL ";
+        }
+
+        cmd.CommandText += "LIMIT 1;";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+
+        if (reader.HasRows) {
+            //mastery exists, altering
+            reader.Read();
+            int p_items_id = reader.GetInt32( 0 );
+            int won = reader.GetInt32( 9 );
+            int played = reader.GetInt32( 10 );
+            connection.Close();
+            reader.Close();
+
+            if( match.won ) won++;
+            played++;
+
+            //update row
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "UPDATE player_items SET won=@won,used=@played WHERE player_items.player_items_id=@pitemid";
+            cmd.Parameters.Add("@won", MySqlDbType.Int32);
+            cmd.Parameters["@won"].Value = won;
+            cmd.Parameters.Add("@played", MySqlDbType.Int32);
+            cmd.Parameters["@played"].Value = played;
+            cmd.Parameters.Add("@pitemid", MySqlDbType.Int32);
+            cmd.Parameters["@pitemid"].Value = p_items_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_items WHERE matchup_id=@mid LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pitemid = reader.GetInt32( 1 ); 
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM player_items WHERE player_items_id=@pitemid;";
+            cmd.Parameters.Add("@pitemid", MySqlDbType.Int32);
+            cmd.Parameters["@pitemid"].Value = best_pitemid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 9 );
+            int best_played = reader.GetInt32( 10 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_items SET player_items_id=@pitemid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pitemid",MySqlDbType.Int32);
+                cmd.Parameters["@pitemid"].Value = p_items_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        } else { 
+            //create new ss, check if its better than the best
+            int won = 0;
+            int played = 1;
+            if( match.won ) won = 1;
+            insertItems( matchup_id, match.items, won, played, false );
+
+            //get this player_rune_set_id and check if its better than the current best
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM player_items WHERE player_items.matchup_id=@mid ";
+            if (match.items[0] != 0) { 
+                cmd.CommandText += "AND item_id1=@id1 ";
+                cmd.Parameters.Add("@id1", MySqlDbType.Int32);
+                cmd.Parameters["@id1"].Value = match.items[0];
+            } else { 
+                cmd.CommandText += "AND item_id1 IS NULL ";
+            }
+            if (match.items[1] != 0) { 
+                cmd.CommandText += "AND item_id2=@id2 ";
+                cmd.Parameters.Add("@id2", MySqlDbType.Int32);
+                cmd.Parameters["@id2"].Value = match.items[1];
+            } else { 
+                cmd.CommandText += "AND item_id2 IS NULL ";
+            }
+            if (match.items[2] != 0) { 
+                cmd.CommandText += "AND item_id3=@id3 ";
+                cmd.Parameters.Add("@id3", MySqlDbType.Int32);
+                cmd.Parameters["@id3"].Value = match.items[2];
+            } else { 
+                cmd.CommandText += "AND item_id3 IS NULL ";
+            }
+            if (match.items[3] != 0) { 
+                cmd.CommandText += "AND item_id4=@id4 ";
+                cmd.Parameters.Add("@id4", MySqlDbType.Int32);
+                cmd.Parameters["@id4"].Value = match.items[3];
+            } else { 
+                cmd.CommandText += "AND item_id4 IS NULL ";
+            }
+            if (match.items[4] != 0) { 
+                cmd.CommandText += "AND item_id5=@id5 ";
+                cmd.Parameters.Add("@id5", MySqlDbType.Int32);
+                cmd.Parameters["@id5"].Value = match.items[4];
+            } else { 
+                cmd.CommandText += "AND item_id5 IS NULL ";
+            }
+            if (match.items[5] != 0) { 
+                cmd.CommandText += "AND item_id6=@id6 ";
+                cmd.Parameters.Add("@id6", MySqlDbType.Int32);
+                cmd.Parameters["@id6"].Value = match.items[5];
+            } else { 
+                cmd.CommandText += "AND item_id6 IS NULL ";
+            }
+            if (match.items[6] != 0) { 
+                cmd.CommandText += "AND item_id7=@id7 ";
+                cmd.Parameters.Add("@id7", MySqlDbType.Int32);
+                cmd.Parameters["@id7"].Value = match.items[6];
+            } else { 
+                cmd.CommandText += "AND item_id7 IS NULL ";
+            }
+            cmd.CommandText += "LIMIT 1;";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int p_items_id = reader.GetInt32( 0 );
+            reader.Close();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_items WHERE matchup_id=@mid LIMIT 1;";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pitemid = reader.GetInt32( 1 );
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_items WHERE player_items_id=@pitemid;";
+            cmd.Parameters.Add("@pitemid", MySqlDbType.Int32);
+            cmd.Parameters["@pitemid"].Value = best_pitemid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 9 );
+            int best_played = reader.GetInt32( 10 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_items SET player_items_id=@pitemid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pitemid",MySqlDbType.Int32);
+                cmd.Parameters["@pitemid"].Value = p_items_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+    }
+
+    protected void updateMasteries(PlayerReturnData match, int summoner_id, int matchup_id) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT * FROM player_mastery WHERE player_mastery.matchup_id=@mid AND player_mastery.offense_values=@off AND player_mastery.defense_values=@def AND player_mastery.utility_values=@util LIMIT 1";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.Parameters.Add("@off", MySqlDbType.VarChar);
+        cmd.Parameters["@off"].Value = match.offense;
+        cmd.Parameters.Add("@def", MySqlDbType.VarChar);
+        cmd.Parameters["@def"].Value = match.defense;
+        cmd.Parameters.Add("@util", MySqlDbType.VarChar);
+        cmd.Parameters["@util"].Value = match.utility;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+
+        if (reader.HasRows) {
+            //mastery exists, altering
+            reader.Read();
+            int p_mastery_id = reader.GetInt32( 0 );
+            int won = reader.GetInt32( 5 );
+            int played = reader.GetInt32( 6 );
+            connection.Close();
+            reader.Close();
+
+            if( match.won ) won++;
+            played++;
+
+            //update row
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "UPDATE player_mastery SET won=@won,used=@played WHERE player_mastery.player_mastery_id=@pmastid";
+            cmd.Parameters.Add("@won", MySqlDbType.Int32);
+            cmd.Parameters["@won"].Value = won;
+            cmd.Parameters.Add("@played", MySqlDbType.Int32);
+            cmd.Parameters["@played"].Value = played;
+            cmd.Parameters.Add("@pmastid", MySqlDbType.Int32);
+            cmd.Parameters["@pmastid"].Value = p_mastery_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_masteries WHERE matchup_id=@mid LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pmastid = reader.GetInt32( 1 ); 
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM player_mastery WHERE player_mastery_id=@pmastid;";
+            cmd.Parameters.Add("@pmastid", MySqlDbType.Int32);
+            cmd.Parameters["@pmastid"].Value = best_pmastid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 5 );
+            int best_played = reader.GetInt32( 6 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_masteries SET player_mastery_id=@pmastid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pmastid",MySqlDbType.Int32);
+                cmd.Parameters["@pmastid"].Value = p_mastery_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        } else { 
+            //create new ss, check if its better than the best
+            int won = 0;
+            int played = 1;
+            if( match.won ) won = 1;
+            insertMastery( matchup_id, match.offense, match.defense, match.utility, won, played, false );
+
+            //get this player_summoner_spell_id and check if its better than the current best
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM player_mastery WHERE player_mastery.matchup_id=@mid AND player_mastery.offense_values=@off AND player_mastery.defense_values=@def AND player_mastery.utility_values=@util LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.Parameters.Add("@off", MySqlDbType.VarChar);
+            cmd.Parameters["@off"].Value = match.offense;
+            cmd.Parameters.Add("@def", MySqlDbType.VarChar);
+            cmd.Parameters["@def"].Value = match.defense;
+            cmd.Parameters.Add("@util", MySqlDbType.VarChar);
+            cmd.Parameters["@util"].Value = match.utility;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int p_mastery_id = reader.GetInt32( 0 );
+            reader.Close();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_masteries WHERE matchup_id=@mid LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pmastid = reader.GetInt32( 1 );
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_mastery WHERE player_mastery_id=@pmastid;";
+            cmd.Parameters.Add("@pmastid", MySqlDbType.Int32);
+            cmd.Parameters["@pmastid"].Value = best_pmastid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 5 );
+            int best_played = reader.GetInt32( 6 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_masteries SET player_mastery_id=@pmastid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pmastid",MySqlDbType.Int32);
+                cmd.Parameters["@pmastid"].Value = p_mastery_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+    }
+
+    protected void updateSS(PlayerReturnData match, int summoner_id, int matchup_id) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT * FROM lolmatchups.player_summoner_spells WHERE player_summoner_spells.matchup_id=@mid AND player_summoner_spells.ss_id1=@ssid1 AND player_summoner_spells.ss_id2=@ssid2 LIMIT 1";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.Parameters.Add("@ssid1", MySqlDbType.Int32);
+        cmd.Parameters["@ssid1"].Value = match.ss[0];
+        cmd.Parameters.Add("@ssid2", MySqlDbType.Int32);
+        cmd.Parameters["@ssid2"].Value = match.ss[1];
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+            
+        if (reader.HasRows) {
+            //ss exists, altering
+            reader.Read();
+            int p_ss_id = reader.GetInt32( 0 );
+            int won = reader.GetInt32( 4 );
+            int played = reader.GetInt32( 5 );
+            connection.Close();
+            reader.Close();
+
+            if( match.won ) won++;
+            played++;
+
+            //update row
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "UPDATE lolmatchups.player_summoner_spells SET won=@won,used=@played WHERE lolmatchups.player_summoner_spells.player_summoner_spells_id=@pssid";
+            cmd.Parameters.Add("@won", MySqlDbType.Int32);
+            cmd.Parameters["@won"].Value = won;
+            cmd.Parameters.Add("@played", MySqlDbType.Int32);
+            cmd.Parameters["@played"].Value = played;
+            cmd.Parameters.Add("@pssid", MySqlDbType.Int32);
+            cmd.Parameters["@pssid"].Value = p_ss_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_ss WHERE matchup_id=@mid LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pssid = reader.GetInt32( 1 );
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_summoner_spells WHERE player_summoner_spells_id=@pssid;";
+            cmd.Parameters.Add("@pssid", MySqlDbType.Int32);
+            cmd.Parameters["@pssid"].Value = best_pssid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 4 );
+            int best_played = reader.GetInt32( 5 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_ss SET player_summoner_spell_id=@pssid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pssid",MySqlDbType.Int32);
+                cmd.Parameters["@pssid"].Value = p_ss_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        } else { 
+            //create new ss, check if its better than the best
+            int won = 0;
+            int played = 1;
+            if( match.won ) won = 1;
+            insertSS( matchup_id, match.ss, won, played, false );
+
+            //get this player_summoner_spell_id and check if its better than the current best
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_summoner_spells WHERE player_summoner_spells.matchup_id=@mid AND player_summoner_spells.ss_id1=@ssid1 AND player_summoner_spells.ss_id2=@ssid2 LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.Parameters.Add("@ssid1", MySqlDbType.Int32);
+            cmd.Parameters["@ssid1"].Value = match.ss[0];
+            cmd.Parameters.Add("@ssid2", MySqlDbType.Int32);
+            cmd.Parameters["@ssid2"].Value = match.ss[1];
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int p_ss_id = reader.GetInt32( 0 );
+            reader.Close();
+            connection.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.best_matchup_ss WHERE matchup_id=@mid LIMIT 1";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_pssid = reader.GetInt32( 1 );
+            connection.Close();
+            reader.Close();
+
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "SELECT * FROM lolmatchups.player_summoner_spells WHERE player_summoner_spells_id=@pssid;";
+            cmd.Parameters.Add("@pssid", MySqlDbType.Int32);
+            cmd.Parameters["@pssid"].Value = best_pssid;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            try { connection.Open(); }
+            catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            int best_won = reader.GetInt32( 4 );
+            int best_played = reader.GetInt32( 5 );
+            connection.Close();
+            reader.Close();
+
+            if (won / played > best_won / best_played) { 
+                cmd = new MySqlCommand();
+                connection = connectToServer();
+                cmd.CommandText = "UPDATE best_matchup_ss SET player_summoner_spell_id=@pssid WHERE matchup_id=@mid;";
+                cmd.Parameters.Add("@pssid",MySqlDbType.Int32);
+                cmd.Parameters["@pssid"].Value = p_ss_id;
+                cmd.Parameters.Add("@mid",MySqlDbType.Int32);
+                cmd.Parameters["@mid"].Value = matchup_id;
+                cmd.CommandType = CommandType.Text;
+                cmd.Connection = connection;
+                connection.Open();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+    }
+
+    protected void updateChampStats(PlayerReturnData match, int summoner_id) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT * FROM lolmatchups.player_champion_stat WHERE lolmatchups.player_champion_stat.summoner_id = @sid AND lolmatchups.player_champion_stat.champion_id=@pid LIMIT 1;";
+        cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+        cmd.Parameters["@sid"].Value = summoner_id;
+        cmd.Parameters.Add("@pid", MySqlDbType.Int32);
+        cmd.Parameters["@pid"].Value = match.pChampId;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+            
+        if (reader.HasRows) {
+            //champ_stat exists, altering
+            reader.Read();
+            int played_as_won = reader.GetInt32( 2 );
+            int played_as_total = reader.GetInt32( 3 );
+            connection.Close();
+            reader.Close();
+
+            if( match.won ) played_as_won++;
+            played_as_total++;
+            //update row
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "UPDATE lolmatchups.player_champion_stat SET played_as_won=@won,played_as_total=@played WHERE lolmatchups.player_champion_stat.summoner_id = @sid AND lolmatchups.player_champion_stat.champion_id = @pid";
+            cmd.Parameters.Add("@won", MySqlDbType.Int32);
+            cmd.Parameters["@won"].Value = played_as_won;
+            cmd.Parameters.Add("@played", MySqlDbType.Int32);
+            cmd.Parameters["@played"].Value = played_as_total;
+            cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+            cmd.Parameters["@sid"].Value = summoner_id;
+            cmd.Parameters.Add("@pid", MySqlDbType.Int32);
+            cmd.Parameters["@pid"].Value = match.pChampId;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        } else {
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "INSERT INTO player_champion_stat(summoner_id,champion_id,played_as_won,played_as_total,played_against_won,played_against_total) VALUES (@sid,@cid,@aswon,1,0,0);";
+            cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+            cmd.Parameters["@sid"].Value = summoner_id;
+            cmd.Parameters.Add("@cid", MySqlDbType.Int32);
+            cmd.Parameters["@cid"].Value = match.pChampId;
+            cmd.Parameters.Add("@aswon", MySqlDbType.Int32);
+            if( match.won ) cmd.Parameters["@aswon"].Value = 1;
+            else cmd.Parameters["@aswon"].Value = 0;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+        //enemy champion
+        cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT * FROM lolmatchups.player_champion_stat WHERE lolmatchups.player_champion_stat.summoner_id = @sid AND lolmatchups.player_champion_stat.champion_id=@oid LIMIT 1;";
+        cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+        cmd.Parameters["@sid"].Value = summoner_id;
+        cmd.Parameters.Add("@oid", MySqlDbType.Int32);
+        cmd.Parameters["@oid"].Value = match.oChampId;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        reader = cmd.ExecuteReader();
+
+        if (reader.HasRows) { 
+            //champ_stat exists, altering
+            reader.Read();
+            int played_against_won = reader.GetInt32( 4 );
+            int played_against_total = reader.GetInt32( 5 );
+            connection.Close();
+            reader.Close();
+             
+            if( match.won ) played_against_won++;
+            played_against_total++;
+            //update row
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "UPDATE lolmatchups.player_champion_stat SET played_against_won=@won,played_against_total=@played WHERE lolmatchups.player_champion_stat.summoner_id = @sid AND lolmatchups.player_champion_stat.champion_id = @oid";
+            cmd.Parameters.Add("@won", MySqlDbType.Int32);
+            cmd.Parameters["@won"].Value = played_against_won;
+            cmd.Parameters.Add("@played", MySqlDbType.Int32);
+            cmd.Parameters["@played"].Value = played_against_total;
+            cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+            cmd.Parameters["@sid"].Value = summoner_id;
+            cmd.Parameters.Add("@oid", MySqlDbType.Int32);
+            cmd.Parameters["@oid"].Value = match.oChampId;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        } else { 
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "INSERT INTO player_champion_stat(summoner_id,champion_id,played_as_won,played_as_total,played_against_won,played_against_total) VALUES (@sid,@cid,0,0,@agwon,1);";
+            cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+            cmd.Parameters["@sid"].Value = summoner_id;
+            cmd.Parameters.Add("@cid", MySqlDbType.Int32);
+            cmd.Parameters["@cid"].Value = match.oChampId;
+            cmd.Parameters.Add("@agwon", MySqlDbType.Int32);
+            if( match.won ) cmd.Parameters["@agwon"].Value = 1;
+            else cmd.Parameters["@agwon"].Value = 0;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+
+    protected void insertSS( int matchup_id, List<int> ss, int won, int played, bool fresh){
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "INSERT INTO lolmatchups.player_summoner_spells(matchup_id, ss_id1, ss_id2, won, used) VALUES (@mid,@id0,@id1,@won,@played);";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.Parameters.Add("@id0",MySqlDbType.Int32);
+        cmd.Parameters["@id0"].Value = ss[0];
+        cmd.Parameters.Add("@id1",MySqlDbType.Int32);
+        cmd.Parameters["@id1"].Value = ss[1];
+        cmd.Parameters.Add("@won",MySqlDbType.Int32);
+        cmd.Parameters["@won"].Value = won;
+        cmd.Parameters.Add("@played",MySqlDbType.Int32);
+        cmd.Parameters["@played"].Value = played;
+        cmd.Connection = connection;
+        connection.Open();
+        cmd.ExecuteNonQuery();
+        connection.Close();
+
+        cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT player_summoner_spells_id FROM player_summoner_spells WHERE matchup_id = @mid;";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+        reader.Read();
+        int p_ss_id = reader.GetInt32( 0 );
+        connection.Close();
+
+        if (fresh) {
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "INSERT INTO best_matchup_ss(matchup_id,player_summoner_spells_id) VALUES (@mid,@ssid);";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.Parameters.Add("@ssid", MySqlDbType.Int32);
+            cmd.Parameters["@ssid"].Value = p_ss_id;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+
+    protected void insertItems(int matchup_id, List<int> items, int won, int played, bool fresh) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "INSERT INTO lolmatchups.player_items(matchup_id, item_id1, item_id2, item_id3, item_id4, item_id5, item_id6, item_id7, won, used) VALUES (@mid,@id0,@id1,@id2,@id3,@id4,@id5,@id6,@won,@played);";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.Parameters.Add("@id0",MySqlDbType.Int32);
+        if( items[0] != 0 ) cmd.Parameters["@id0"].Value = items[0];
+        else cmd.Parameters["@id0"].Value = null;
+        cmd.Parameters.Add("@id1",MySqlDbType.Int32);
+        if( items[1] != 0 ) cmd.Parameters["@id1"].Value = items[1];
+        else cmd.Parameters["@id1"].Value = null;
+        cmd.Parameters.Add("@id2",MySqlDbType.Int32);
+        if( items[2] != 0 ) cmd.Parameters["@id2"].Value = items[2];
+        else cmd.Parameters["@id2"].Value = null;
+        cmd.Parameters.Add("@id3",MySqlDbType.Int32);
+        if( items[3] != 0 ) cmd.Parameters["@id3"].Value = items[3];
+        else cmd.Parameters["@id3"].Value = null;
+        cmd.Parameters.Add("@id4",MySqlDbType.Int32);
+        if( items[4] != 0 ) cmd.Parameters["@id4"].Value = items[4];
+        else cmd.Parameters["@id4"].Value = null;
+        cmd.Parameters.Add("@id5",MySqlDbType.Int32);
+        if( items[5] != 0 ) cmd.Parameters["@id5"].Value = items[5];
+        else cmd.Parameters["@id5"].Value = null;
+        cmd.Parameters.Add("@id6",MySqlDbType.Int32);
+        if( items[6] != 0 ) cmd.Parameters["@id6"].Value = items[6];
+        else cmd.Parameters["@id6"].Value = null;
+        cmd.Parameters.Add("@won",MySqlDbType.Int32);
+        cmd.Parameters["@won"].Value = won;
+        cmd.Parameters.Add("@played",MySqlDbType.Int32);
+        cmd.Parameters["@played"].Value = played;
+        cmd.Connection = connection;
+        connection.Open();
+        cmd.ExecuteNonQuery();
+        connection.Close();
+
+        cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT player_items_id FROM player_items WHERE matchup_id = @mid;";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+        reader.Read();
+        int p_items_id = reader.GetInt32( 0 );
+        connection.Close();
+
+        if (fresh) { 
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "INSERT INTO best_matchup_items(matchup_id,player_items_id) VALUES (@mid,@itemsid);";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.Parameters.Add("@itemsid", MySqlDbType.Int32);
+            cmd.Parameters["@itemsid"].Value = p_items_id;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+
+    protected void insertMatchup(int summoner_id, int pChampId, int oChampId, int won, int played, int kills, int deaths, int assists, int cs) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "INSERT INTO lolmatchups.player_matchup(summoner_id, player_champion_id, opponent_champion_id, won, played, kills, deaths, assists, cumulative_creep_score) VALUES (@sid,@pid,@oid,@won,@played,@kills,@deaths,@assists,@cs);";
+        cmd.Parameters.Add("@sid", MySqlDbType.Int32);
+        cmd.Parameters["@sid"].Value = summoner_id;
+        cmd.Parameters.Add("@pid",MySqlDbType.Int32);
+        cmd.Parameters["@pid"].Value = pChampId;
+        cmd.Parameters.Add("@oid",MySqlDbType.Int32);
+        cmd.Parameters["@oid"].Value = oChampId;
+        cmd.Parameters.Add("@won",MySqlDbType.Int32);
+        cmd.Parameters["@won"].Value = won;
+        cmd.Parameters.Add("@played",MySqlDbType.Int32);
+        cmd.Parameters["@played"].Value = played;
+        cmd.Parameters.Add("@kills",MySqlDbType.Int32);
+        cmd.Parameters["@kills"].Value = kills;
+        cmd.Parameters.Add("@deaths",MySqlDbType.Int32);
+        cmd.Parameters["@deaths"].Value = deaths;
+        cmd.Parameters.Add("@assists",MySqlDbType.Int32);
+        cmd.Parameters["@assists"].Value = assists;
+        cmd.Parameters.Add("@cs",MySqlDbType.Int32);
+        cmd.Parameters["@cs"].Value = cs;
+        cmd.Connection = connection;
+        connection.Open();
+        cmd.ExecuteNonQuery();
+        connection.Close();
+    }
+
+    protected void insertMastery( int matchup_id, string offense, string defense, string utility, int won, int played, bool fresh ){
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "INSERT INTO lolmatchups.player_mastery(matchup_id, offense_values, defense_values, utility_values, won, used) VALUES (@mid,@off,@def,@util,@won,@played);";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.Parameters.Add("@off",MySqlDbType.VarChar);
+        cmd.Parameters["@off"].Value = offense;
+        cmd.Parameters.Add("@def",MySqlDbType.VarChar);
+        cmd.Parameters["@def"].Value = defense;
+        cmd.Parameters.Add("@util",MySqlDbType.VarChar);
+        cmd.Parameters["@util"].Value = utility;
+        cmd.Parameters.Add("@won",MySqlDbType.Int32);
+        cmd.Parameters["@won"].Value = won;
+        cmd.Parameters.Add("@played",MySqlDbType.Int32);
+        cmd.Parameters["@played"].Value = played;
+        cmd.Connection = connection;
+        connection.Open();
+        cmd.ExecuteNonQuery();
+        connection.Close();
+
+        cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT player_mastery_id FROM player_mastery WHERE matchup_id = @mid;";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+        reader.Read();
+        int p_mastery_id = reader.GetInt32( 0 );
+        connection.Close();
+        reader.Close();
+
+        if (fresh) { 
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "INSERT INTO best_matchup_masteries(matchup_id,player_mastery_id) VALUES (@mid,@mastid);";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.Parameters.Add("@mastid", MySqlDbType.Int32);
+            cmd.Parameters["@mastid"].Value = p_mastery_id;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+
+    protected void insertRunes(int matchup_id, List<int> runes, int won, int played, bool fresh) { 
+        MySqlCommand cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "INSERT INTO lolmatchups.player_rune_set(matchup_id,rune_id1,rune_id2,rune_id3,rune_id4,rune_id5,rune_id6,rune_id7,rune_id8,rune_id9,rune_id10,rune_id11,rune_id12,rune_id13,rune_id14,rune_id15,rune_id16,rune_id17,rune_id18,rune_id19,rune_id20,rune_id21,rune_id22,rune_id23,rune_id24,rune_id25,rune_id26,rune_id27,rune_id28,rune_id29,rune_id30,won,used) VALUES (@mid,@r1,@r2,@r3,@r4,@r5,@r6,@r7,@r8,@r9,@r10,@r11,@r12,@r13,@r14,@r15,@r16,@r17,@r18,@r19,@r20,@r21,@r22,@r23,@r24,@r25,@r26,@r27,@r28,@r29,@r30,@won,@played);";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        for (int i = 1; i < runes.Count+1; i++) { 
+            cmd.Parameters.Add("@r"+i.ToString(), MySqlDbType.Int32);
+            cmd.Parameters["@r"+i.ToString()].Value = runes[i-1];
+        }
+        for (int i = runes.Count; i < 30; i++) { 
+            cmd.Parameters.Add("@r"+i.ToString(), MySqlDbType.Int32);
+            cmd.Parameters["@r"+i.ToString()].Value = null;
+        }
+        cmd.Parameters.Add("@won",MySqlDbType.Int32);
+        cmd.Parameters["@won"].Value = won;
+        cmd.Parameters.Add("@played",MySqlDbType.Int32);
+        cmd.Parameters["@played"].Value = played;
+        cmd.Connection = connection;
+        connection.Open();
+        cmd.ExecuteNonQuery();
+        connection.Close();
+
+        cmd = new MySqlCommand();
+        connection = connectToServer();
+        cmd.CommandText = "SELECT player_rune_set_id FROM player_rune_set WHERE matchup_id = @mid;";
+        cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+        cmd.Parameters["@mid"].Value = matchup_id;
+        cmd.CommandType = CommandType.Text;
+        cmd.Connection = connection;
+        try { connection.Open(); }
+        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
+        MySqlDataReader reader = cmd.ExecuteReader();
+        reader.Read();
+        int p_runes_id = reader.GetInt32( 0 );
+        connection.Close();
+
+        if (fresh) { 
+            cmd = new MySqlCommand();
+            connection = connectToServer();
+            cmd.CommandText = "INSERT INTO best_matchup_rune_set(matchup_id,player_rune_set_id) VALUES (@mid,@rsid);";
+            cmd.Parameters.Add("@mid", MySqlDbType.Int32);
+            cmd.Parameters["@mid"].Value = matchup_id;
+            cmd.Parameters.Add("@rsid", MySqlDbType.Int32);
+            cmd.Parameters["@rsid"].Value = p_runes_id;
+            cmd.Connection = connection;
+            connection.Open();
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+    }
+
+    //START DataContract for matchhistory query
+    [DataContract]
+    public class MatchHistoryResponse {
+        [DataMember]
+        public Match[] matches{ get; set; }
+    }
+
+    [DataContract]
+    public class Match { 
+        [DataMember]
+        public string matchVersion { get; set; }
+        [DataMember]
+        public string region { get; set; }
+        [DataMember]
+        public int mapId { get; set; }
+        [DataMember]
+        public string season { get; set; }
+        [DataMember]
+        public string queueType { get; set; }
+        [DataMember]
+        public int matchDuration { get; set; }
+        [DataMember]
+        public long matchCreation { get; set; }
+        [DataMember]
+        public string matchType { get; set; }
+        [DataMember]
+        public int matchId { get; set; }
+        [DataMember]
+        public Participant[] participants { get; set; }
+        [DataMember]
+        public string matchMode { get; set; }
+        [DataMember]
+        public string platformId { get; set; }
+        [DataMember]
+        public ParticipantIdentity[] participantIdentities { get; set; }
+        [DataMember]
+        public int participantId { get; set; }
+    }
+
+    [DataContract]
+    public class Participant { 
+        [DataMember]
+        public Mastery[] masteries { get; set; }
+        [DataMember]
+        public Stats stats { get; set; }
+        [DataMember]
+        public Rune[] runes { get; set; }
+        [DataMember]
+        public Timeline timeline { get; set; }
+        [DataMember]
+        public int spell2Id { get; set; }
+        [DataMember]
+        public int participantId { get; set; }
+        [DataMember]
+        public int championId { get; set; }
+        [DataMember]
+        public int teamId { get; set; }
+        [DataMember]
+        public string highestAchievedSeasonTier { get; set; }
+        [DataMember]
+        public int spell1Id { get; set; }
+    }
+
+    [DataContract]
+    public class Mastery { 
+        [DataMember]
+        public int rank { get; set; }
+        [DataMember]
+        public int masteryId { get; set; }
+    }
+
+    [DataContract]
+    public class Stats { 
+        [DataMember]
+        public int unrealKills { get; set; }
+        [DataMember]
+        public int item2 { get; set; }
+        [DataMember]
+        public int item1 { get; set; }
+        [DataMember]
+        public int totalDamageTaken { get; set; }
+        [DataMember]
+        public int item0 { get; set; }
+        [DataMember]
+        public int pentaKills { get; set; }
+        [DataMember]
+        public int sightWardsBoughtInGame { get; set; }
+        [DataMember]
+        public Boolean winner { get; set; }
+        [DataMember]
+        public int magicDamageDealt { get; set; }
+        [DataMember]
+        public int wardsKilled { get; set; }
+        [DataMember]
+        public int largestCriticalStrike { get; set; }
+        [DataMember]
+        public int trueDamageDealt { get; set; }
+        [DataMember]
+        public int doubleKills { get; set; }
+        [DataMember]
+        public int physicalDamageDealt { get; set; }
+        [DataMember]
+        public int tripleKills { get; set; }
+        [DataMember]
+        public int deaths { get; set; }
+        [DataMember]
+        public Boolean firstBloodAssist { get; set; }
+        [DataMember]
+        public int magicDamageDealtToChampions { get; set; }
+        [DataMember]
+        public int assists { get; set; }
+        [DataMember]
+        public int visionWardsBoughtInGame { get; set; }
+        [DataMember]
+        public int totalTimeCrowdControlDealt { get; set; }
+        [DataMember]
+        public int champLevel { get; set; }
+        [DataMember]
+        public int physicalDamageTaken { get; set; }
+        [DataMember]
+        public int totalDamageDealt { get; set; }
+        [DataMember]
+        public int largestKillingSpree { get; set; }
+        [DataMember]
+        public int inhibitorKills { get; set; }
+        [DataMember]
+        public int minionsKilled { get; set; }
+        [DataMember]
+        public int towerKills { get; set; }
+        [DataMember]
+        public int physicalDamageDealtToChampions { get; set; }
+        [DataMember]
+        public int quadraKills { get; set; }
+        [DataMember]
+        public int goldSpent { get; set; }
+        [DataMember]
+        public int totalDamageDealtToChampions { get; set; }
+        [DataMember]
+        public int goldEarned { get; set; }
+        [DataMember]
+        public int neutralMinionsKilledTeamJungle { get; set; }
+        [DataMember]
+        public Boolean firstBloodKill { get; set; }
+        [DataMember]
+        public Boolean firstTowerKill { get; set; }
+        [DataMember]
+        public int wardsPlaced { get; set; }
+        [DataMember]
+        public int trueDamageDealtToChampions { get; set; }
+        [DataMember]
+        public int killingSprees { get; set; }
+        [DataMember]
+        public Boolean firstInhibitorKill { get; set; }
+        [DataMember]
+        public int totalScoreRank { get; set; }
+        [DataMember]
+        public int totalUnitsHealed { get; set; }
+        [DataMember]
+        public int kills { get; set; }
+        [DataMember]
+        public Boolean firstInhibitorAssist { get; set; }
+        [DataMember]
+        public int totalPlayerScore { get; set; }
+        [DataMember]
+        public int neutralMinionsKilledEnemyJungle { get; set; }
+        [DataMember]
+        public int magicDamageTaken { get; set; }
+        [DataMember]
+        public int largestMultiKill { get; set; }
+        [DataMember]
+        public int totalHeal { get; set; }
+        [DataMember]
+        public int item4 { get; set; }
+        [DataMember]
+        public int item3 { get; set; }
+        [DataMember]
+        public int objectivePlayerScore { get; set; }
+        [DataMember]
+        public int item6 { get; set; }
+        [DataMember]
+        public Boolean firstTowerAssist { get; set; }
+        [DataMember]
+        public int item5 { get; set; }
+        [DataMember]
+        public int trueDamageTaken { get; set; }
+        [DataMember]
+        public int neutralMinionsKilled { get; set; }
+        [DataMember]
+        public int combatPlayerScore { get; set; }
+    }
+
+    [DataContract]
+    public class Rune { 
+        [DataMember]
+        public int rank { get; set; }
+        [DataMember]
+        public int runeId { get; set; }
+    }
+
+    [DataContract]
+    public class Timeline { 
+        [DataMember]
+        public string lane { get; set; }
+        [DataMember]
+        public string role { get; set; }
+    }
+
+    [DataContract]
+    public class ParticipantIdentity { 
+        [DataMember]
+        public Player player { get; set; }
+        [DataMember]
+        public int participantId { get; set; }
+    }
+
+    [DataContract]
+    public class Player { 
+        [DataMember]
+        public int profileIcon { get; set; }
+        [DataMember]
+        public string matchHistoryUri { get; set; }
+        [DataMember]
+        public string summonerName { get; set; }
+        [DataMember]
+        public int summonerId { get; set; }
+    }
+    //END DataContract for matchhistory query
+
+    //START Classes for summoner ID query
+    [DataContract]
+    public class SummonerInfo { 
+        [DataMember]
+        public int id { get; set; }
+        [DataMember]
+        public string name { get; set; }
+        [DataMember]
+        public int profileIconId { get; set; }
+        [DataMember]
+        public long revisionDate { get; set; }
+        [DataMember]
+        public int summonerLevel { get; set; }
+    }
+    //END DataContract for summoner ID query
+
+    //START DataContracts for League query
+    [DataContract]
+    public class League { 
+        [DataMember]
+        public string queue { get; set; }
+        [DataMember]
+        public string name { get; set; }
+        [DataMember]
+        public Entry[] entries { get; set; }
+        [DataMember]
+        public string tier {  get; set; }
+    }
+
+    [DataContract]
+    public class Entry { 
+        [DataMember]
+        public int leaguePoints { get; set; }
+        [DataMember]
+        public Boolean isFreshBlood { get; set; }
+        [DataMember]
+        public Boolean isHotStreak { get; set; }
+        [DataMember]
+        public string division { get; set; }
+        [DataMember]
+        public Boolean isInactive { get; set; }
+        [DataMember]
+        public Boolean isVeteran{ get; set; }
+        [DataMember]
+        public int losses { get; set; }
+        [DataMember]
+        public string playerOrTeamName { get; set; }
+        [DataMember]
+        public string playerOrTeamId { get; set; }
+        [DataMember]
+        public int wins { get; set; }
+    }
+
+    protected class PlayerReturnData { 
+        public List<int> ss;
+        public List<int> runes;
+        public List<int> items;
+        public string offense;
+        public string defense;
+        public string utility;
+        public int kills;
+        public int deaths;
+        public int assists;
+        public int cs;
+        public int pChampId;
+        public int oChampId;
+        public bool won;
+        public int match_id;
     }
 }
