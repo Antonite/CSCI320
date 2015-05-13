@@ -20,7 +20,7 @@ public partial class _Default : System.Web.UI.Page
 
     protected void submit(object sender, EventArgs e)
     {
-        summonerName = summoner_box.Text;
+        Session["summonerName"] = summoner_box.Text;
         Response.Redirect("main.aspx");
     }
 }

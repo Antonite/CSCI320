@@ -14,8 +14,8 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <div class="upper">
-        <div id="navbar" class="navbar navbar-lol navbar-splash">
+    <div class="upper upper-splash">
+        <div id="navbar" class="navbar navbar-lol navbar-splash" style="z-index: 1">
             <a class="navbar-brand" href="#">LoLMatchups</a>
             <div class="navbar-form input-group">
                     <asp:TextBox ID="summoner_box" runat="server" placeholder="Enter a summoner's name" class="form-control text-nav-lol" />
@@ -23,10 +23,25 @@
                 </div>
         </div>
 
+        <%-- Literal magic being undergone here http://mazwai.com/system/posts/videos/000/000/109/webm/leif_eliasson--glaciartopp.webm?1410742112 --%>
+
+        <div class="video-container">
+            <video class="bgvid" autoplay="autoplay" muted="muted" preload="auto" loop>
+                <source src="http://a.pomf.se/wcfxcn.webm" type="video/webm">
+            </video>
+        </div>
+
         <div id="container">
             <div class="row center">
                 <div class="col-md-1"></div>
+               
                 <div class="col-md-10 panel splash-panel">
+                    <div class="video-container blur">
+                        <video class="bgvid" autoplay="false" muted="muted" preload="auto" loop>
+                            <source src="http://a.pomf.se/wcfxcn.webm" type="video/webm">
+                        </video>
+                    </div>
+
                     <h1 class="fullwidth splash-text">Why LoLMatchups?</h1>
                     <div class="row">
                         <div class="col-md-6">
