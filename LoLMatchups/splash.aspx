@@ -23,7 +23,7 @@
                 </div>
         </div>
 
-        <%-- Literal magic being undergone here http://mazwai.com/system/posts/videos/000/000/109/webm/leif_eliasson--glaciartopp.webm?1410742112 --%>
+        <%-- Literal magic being undergone here --%>
 
         <div class="video-container">
             <video class="bgvid" autoplay="autoplay" muted="muted" preload="auto" loop>

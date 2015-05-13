@@ -15,16 +15,37 @@ public partial class _Default : System.Web.UI.Page
     //todo case sensitivity
     private MySqlConnection connection;
     private static String summonerId;
-
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (((String) HttpContext.Current.Session["summonerName"]) != "")
+        {
+            summoner_box.Text = (String) HttpContext.Current.Session["summonerName"];
+            HttpContext.Current.Session["summonerName"] = "";
+            submit(findSummoner, null);
+
+            summoner_id.Text = "";
+            status.Text = "";
+            status.Style.Add("display", "none");
+            summoner_id.Style.Add("display", "none");
+            runeTable.Style.Add("display", "none");
+            matchup_panel.Style.Add("display", "none");
+
+            return;
+            //this.findSummoner.Click(this.findSummoner, EventArgs.Empty);
+        }
+
+        if (sum_rank.InnerText.Equals("Rank"))
+        {
+            champ_button.Attributes.Add("disabled", "disabled");
+        }
+
+
         summoner_id.Text = "";
         status.Text = "";
         status.Style.Add("display", "none");
         summoner_id.Style.Add("display", "none");
         runeTable.Style.Add("display", "none");
 
-        champ_button.Attributes.Add("disabled", "disabled");
         matchup_panel.Style.Add("display", "none");
 
         //itemImg1.Style.Add("display", "none");
@@ -41,7 +62,7 @@ public partial class _Default : System.Web.UI.Page
         matchupTopItemsPercent.Text = "";
         matchupTopRunesPercent.Text = "";
         matchupTopMasteriesPercent.Text = "";
-        connection = connectToServer();
+        // connection = connectToServer();
     }
 
     protected String parseRank (String rank)
@@ -91,7 +112,8 @@ public partial class _Default : System.Web.UI.Page
     }
 
     protected void submit(object sender, EventArgs e)
-    {   
+    {
+        connection = connectToServer();
         MySqlDataReader reader;
         //search for summoner, Dynamic SQL
         MySqlCommand cmd = new MySqlCommand();
@@ -147,6 +169,7 @@ public partial class _Default : System.Web.UI.Page
 
     protected void getMatchups (object sender, EventArgs e)
     {
+        connection = connectToServer();
         string championAsName;
         string championVsName;
         string offenceMastery;

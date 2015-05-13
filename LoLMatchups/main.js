@@ -35,6 +35,9 @@ $(document).ready(function () {
     $(".mastery-tile").each(function () {
         var buffText = $(this).children(".mastery-desc").first().text();
 
+        if ($(this).children(".mastery-level").text().startsWith("0"))
+            $(this).css("opacity", ".5");
+
         $(this).on({
             mouseenter: function () {
                 $("#mastery_buff").text(buffText);
@@ -49,9 +52,8 @@ $(document).ready(function () {
     $(".winrate").each(function () {
         var contents = $(this).text();
 
-        if (contents == "NaN%")
+        if (contents == "None played")
         {
-            $(this).text("No games played");
             $(this).css("color", "#aaa");
         }
         else 
@@ -59,11 +61,6 @@ $(document).ready(function () {
             var percent = contents.substring(0, contents.length - 1);
 
             $(this).css("color", jQuery.Color("#444").transition(jQuery.Color("#3949ab"), percent / 100));
-
-            /*if (percent > 50)
-                $(this).css("color", "#00ff00");
-            else
-                $(this).css("color", "#ff0000");*/
         }
     });
 });

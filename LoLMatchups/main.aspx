@@ -5,6 +5,10 @@
 <html>
 <head runat="server">
     <script src="//code.jquery.com/jquery-1.11.2.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            if ($("#summoner_box").val() != "" && $("#sum_name").text() != $("#summoner_box").val())
+                $("#findSummoner").click();
+        </script>
     <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js" type="text/javascript"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type="text/css">
@@ -125,8 +129,8 @@
                                 <div class="row center">
                                     <div class="col-md-3 matchup-header">Matchup winrate</div>
                                     <div class="col-md-3 matchup-header">Items</div>
-                                    <div class="col-md-3 matchup-header"><a href="matchup_panel">Runes</a></div>
-                                    <div class="col-md-3 matchup-header"><a href="#mastery_panel">Masteries</a></div>
+                                    <div class="col-md-3 matchup-header">Runes</div>
+                                    <div class="col-md-3 matchup-header">Masteries</div>
                                 </div>
 
                                             <div class="row center">
