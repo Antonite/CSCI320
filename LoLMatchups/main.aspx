@@ -251,12 +251,12 @@
                 <%-- <div id="summary_panel" runat="server" class="fullwidth panel panel_lol">Player Summary</div> --%>
 
                 <div id="champion_panel" runat="server" class="fullwidth panel panel_lol">
-                    <div class="row">
-                        <%--You can fit 6 champion_tile divs on one line. However, the overflow should occur automatically so you can 
+                     <%--<div class="row">
+                       You can fit 6 champion_tile divs on one line. However, the overflow should occur automatically so you can 
                         just drop all of the divs into this row div. For the 1st and 6th tiles in every row, you need to subclass
                         it with champion_tile_first or champion_tile_last so that the margins don't get messed up.
                         
-                        Note that since champion_panel has a set height, weird stuff will probably happen if you have more than 2 rows of tiles.--%>
+                        Note that since champion_panel has a set height, weird stuff will probably happen if you have more than 2 rows of tiles.
 
                         <div id="example_champ" runat="server" class="col-md-2 panel champion_tile champion_tile_first">
                             <table class="fullwidth center">
@@ -285,7 +285,7 @@
                                 </tr>
                             </table>
                         </div>
-                    </div>
+                    </div>--%>
                 </div>
 
                 <div id="rune_panel" runat="server" class="fullwidth panel panel_lol">

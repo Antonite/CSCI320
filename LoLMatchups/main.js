@@ -36,7 +36,7 @@ $(document).ready(function () {
         var buffText = $(this).children(".mastery-desc").first().text();
 
         if ($(this).children(".mastery-level").text().startsWith("0"))
-            $(this).css("opacity", ".5");
+            $(this).css("opacity", ".2");
 
         $(this).on({
             mouseenter: function () {

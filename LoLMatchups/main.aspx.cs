@@ -699,25 +699,28 @@ public partial class _Default : System.Web.UI.Page
         //search for summoner, Dynamic SQL
         MySqlCommand cmd = new MySqlCommand();
 
+        Dictionary<string, string[]> allChampions = new Dictionary<string, string[]>();
+
         //fill percent total % champions
         cmd = new MySqlCommand();
         cmd.CommandText = "select champs.name, " +
                             "stats.played_as_won, " +
                             "stats.played_as_total, " +
                             "stats.played_against_won, " +
-                            "stats.played_against_total " +
+                            "stats.played_against_total, " +
+                            "stats.champion_id " +
             "from lolmatchups.player_champion_stat stats " +
             "join lolmatchups.champion champs on stats.champion_id = champs.champion_id " +
-            "where stats.summoner_id = @id and champs.name in (@as, @vs)";
-        cmd.Parameters.Add("@as", MySqlDbType.VarChar, 32);
-        cmd.Parameters["@as"].Value = nameAs;
-        cmd.Parameters.Add("@vs", MySqlDbType.VarChar, 32);
-        cmd.Parameters["@vs"].Value = nameVs;
+            "where stats.summoner_id = @id";
+        //cmd.Parameters.Add("@as", MySqlDbType.VarChar, 32);
+        //cmd.Parameters["@as"].Value = nameAs;
+        //cmd.Parameters.Add("@vs", MySqlDbType.VarChar, 32);
+        //cmd.Parameters["@vs"].Value = nameVs;
         cmd.Parameters.Add("@id", MySqlDbType.VarChar, 8);
         cmd.Parameters["@id"].Value = summonerId;
         cmd.CommandType = CommandType.Text;
         cmd.Connection = connection;
-        
+
 
         //open connection
         try { connection.Open(); }
@@ -728,44 +731,45 @@ public partial class _Default : System.Web.UI.Page
         {
             reader = cmd.ExecuteReader();
 
-            float winPercentAschamp;
-            float winPercentVschamp;
+            string winPercentAschamp;
+            string winPercentVschamp;
 
             if (reader.HasRows)
             {
-                reader.Read();
-                if(reader.GetString(0).Equals(nameAs))
+                while (reader.Read())
                 {
-                    winPercentAschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
-                    winPercentVschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
-                    winPercentAsLeft.Text = winPercentAschamp + "%";
-                    winPercentVsLeft.Text = winPercentVschamp + "%";
-                
-                    reader.Read();
-                    winPercentAschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
-                    winPercentVschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
-                    winPercentAsRight.Text = winPercentAschamp + "%";
-                    winPercentVsRight.Text = winPercentVschamp + "%";
-                }
-                else
-                {
-                    winPercentVschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
-                    winPercentAschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
-                    winPercentAsLeft.Text = winPercentAschamp + "%";
-                    winPercentVsLeft.Text = winPercentVschamp + "%";
-                
-                    reader.Read();
-                    winPercentVschamp = reader.GetFloat(1) / reader.GetFloat(2) * 100;
-                    winPercentAschamp = reader.GetFloat(3) / reader.GetFloat(4) * 100;
-                    winPercentAsRight.Text = winPercentAschamp + "%";
-                    winPercentVsRight.Text = winPercentVschamp + "%";
+
+                    winPercentAschamp = Math.Round(reader.GetFloat(1) / reader.GetFloat(2) * 100) + "%";
+                    winPercentVschamp = Math.Round(reader.GetFloat(3) / reader.GetFloat(4) * 100) + "%";
+                    if (winPercentAschamp.Equals("NaN%")) winPercentAschamp = "None played";
+                    if (winPercentVschamp.Equals("NaN%")) winPercentVschamp = "None played";
+
+
+                    if (reader.GetString(0).Equals(nameAs))
+                    {
+                        winPercentAsLeft.Text = winPercentAschamp;
+                        winPercentVsLeft.Text = winPercentVschamp;
+                    }
+                    else if (reader.GetString(0).Equals(nameVs))
+                    {
+                        winPercentAsRight.Text = winPercentAschamp;
+                        winPercentVsRight.Text = winPercentVschamp;
+                    }
+
+
+                    if (!winPercentAschamp.Equals("None played"))
+                    {
+                        string[] champStats = new string[3];
+                        champStats[0] = reader.GetString(5);
+                        champStats[1] = winPercentAschamp;
+                        champStats[2] = winPercentVschamp;
+                        allChampions.Add(reader.GetString(0), champStats);
+                    }
+
                 }
 
-                //cleanup in case no matches were played
-                if (winPercentAsLeft.Text.Equals("NaN%")) winPercentAsLeft.Text = "None played";
-                if (winPercentVsLeft.Text.Equals("NaN%")) winPercentVsLeft.Text = "None played";
-                if (winPercentAsRight.Text.Equals("NaN%")) winPercentAsRight.Text = "None played";
-                if (winPercentVsRight.Text.Equals("NaN%")) winPercentVsRight.Text = "None played";
+
+                createChampions(allChampions);
 
             }
             else
@@ -779,6 +783,71 @@ public partial class _Default : System.Web.UI.Page
         {
             matchupStats.Text = notFound.ToString();
             connection.Close();
+        }
+
+    }
+
+    protected void createChampions(Dictionary<string, string[]> allChampions)
+    {
+        String champTile;
+        String champRow;
+        String tag = "";
+        int count = 0;
+
+        champRow = "";
+
+
+        foreach (string aName in allChampions.Keys)
+        {
+            count++;
+            if (count == 1)
+            {
+                champRow = "<div class=\"row\">";
+                tag = "champion_tile_first";
+            }
+            else if (count == 6)
+            {
+                tag = "champion_tile_last";
+            }
+
+            champTile = "<div id=\"example_champ\" runat=\"server\" class=\"col-md-2 panel champion_tile " + tag + " \">" +
+                            "<table class=\"fullwidth center\">" +
+                                "<tr>" +
+                                    "<td>" +
+                                        "<img src=\"ChampionImages\\" + aName + "_Square_0.png\" class=\"champion_portrait center\"></img>" +
+                                        "<div class=\"champion_name\">" + aName + "</div>" +
+                                    "</td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                    "<td>" +
+                                        "<div class=\"champion_as_won won\">" + allChampions[aName][1] + "</div>" +
+                                    "</td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                    "<td>" +
+                                        "<div class=\"champion_vs_won won\">" + allChampions[aName][2] + "</div>" +
+                                    "</td>" +
+                                "</tr>" +
+                            "</table>" +
+                        "</div>";
+
+            champRow += champTile;
+
+            if (count == 6)
+            {
+                champRow += "</div>";
+                champion_panel.Controls.Add(new LiteralControl(champRow));
+                count = 0;
+            }
+
+            tag = "";
+
+        }
+
+        if (count != 0)
+        {
+            champRow += "</div>";
+            champion_panel.Controls.Add(new LiteralControl(champRow));
         }
 
     }
