@@ -279,6 +279,7 @@ public partial class _Default : System.Web.UI.Page
     protected void submit(object sender, EventArgs e)
     {
         connection = connectToServer();
+        Debug.WriteLine( "START" );
         MySqlDataReader reader;
         updateDb( summoner_box.Text );
         //search for summoner, Dynamic SQL
@@ -1137,7 +1138,8 @@ public partial class _Default : System.Web.UI.Page
 
     private void updateDb(String summoner_name)
     {
-        //connection.Close();
+        Debug.WriteLine( "updateDb");
+        connection.Close();
         MySqlDataReader reader;
         MySqlCommand cmd = new MySqlCommand();
         cmd.CommandText = "SELECT player.summoner_id, player.name, player.last_update_match_id FROM lolmatchups.player WHERE lolmatchups.player.name = @name LIMIT 1";
@@ -1145,10 +1147,9 @@ public partial class _Default : System.Web.UI.Page
         cmd.Parameters["@name"].Value = summoner_name;
         cmd.CommandType = CommandType.Text;
         //open connection
-        try { connection.Open(); }
-        catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
         cmd.Connection = connection;
-          
+        try{connection.Open();} catch (Exception e) { Debug.WriteLine("!!!!!!" + e.Message);}
+         
         
         try { 
             reader = cmd.ExecuteReader();
@@ -1177,6 +1178,7 @@ public partial class _Default : System.Web.UI.Page
                     }
                 } catch (Exception e) { Debug.WriteLine( e.Message ); }
             } else {
+                Debug.WriteLine("No Record");
                 connection.Close();
                 reader.Close();
                 //Get summoner ID and build a simple match history
@@ -1184,10 +1186,10 @@ public partial class _Default : System.Web.UI.Page
                 
                 HttpWebResponse response = executeApiRequest( summoner_url );
                 
-                
+                 
                 Dictionary<string, SummonerInfo> json_response = new JavaScriptSerializer().Deserialize<Dictionary<string, SummonerInfo>>( new StreamReader( response.GetResponseStream() ).ReadToEnd() );
 
-                string stored_summoner_name = summoner_name.ToLower().Trim();
+                string stored_summoner_name = summoner_name.ToLower().Trim(); 
                 SummonerInfo s_info = json_response[stored_summoner_name];
 
                 String mh_url1 = "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/" + s_info.id + "?rankedQueues=RANKED_SOLO_5x5,RANKED_TEAM_5x5&api_key=" + API_KEY;
@@ -2195,7 +2197,8 @@ public partial class _Default : System.Web.UI.Page
                 cmd.ExecuteNonQuery();
                 connection.Close();
             }
-        } else { 
+        } else {
+            connection.Close();
             //create new ss, check if its better than the best
             int won = 0;
             int played = 1;
@@ -2266,7 +2269,7 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
-    protected void updateChampStats(PlayerReturnData match, int summoner_id) { 
+    protected void updateChampStats(PlayerReturnData match, int summoner_id) {
         MySqlCommand cmd = new MySqlCommand();
         cmd.CommandText = "SELECT * FROM lolmatchups.player_champion_stat WHERE lolmatchups.player_champion_stat.summoner_id = @sid AND lolmatchups.player_champion_stat.champion_id=@pid LIMIT 1;";
         cmd.Parameters.Add("@sid", MySqlDbType.Int32);
@@ -2306,6 +2309,7 @@ public partial class _Default : System.Web.UI.Page
             cmd.ExecuteNonQuery();
             connection.Close();
         } else {
+            connection.Close();
             cmd = new MySqlCommand();
             cmd.CommandText = "INSERT INTO player_champion_stat(summoner_id,champion_id,played_as_won,played_as_total,played_against_won,played_against_total) VALUES (@sid,@cid,@aswon,1,0,0);";
             cmd.Parameters.Add("@sid", MySqlDbType.Int32);
@@ -2420,12 +2424,13 @@ public partial class _Default : System.Web.UI.Page
             cmd.Parameters["@ssid"].Value = p_ss_id;
             cmd.Connection = connection;
             connection.Open();
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery(); 
             connection.Close();
         }
     }
 
     protected void insertItems(int matchup_id, List<int> items, int won, int played, bool fresh) { 
+        connection.Close();
         MySqlCommand cmd = new MySqlCommand();
         cmd.CommandText = "INSERT INTO lolmatchups.player_items(matchup_id, item_id1, item_id2, item_id3, item_id4, item_id5, item_id6, item_id7, won, used) VALUES (@mid,@id0,@id1,@id2,@id3,@id4,@id5,@id6,@won,@played);";
         cmd.Parameters.Add("@mid", MySqlDbType.Int32);
@@ -2488,6 +2493,7 @@ public partial class _Default : System.Web.UI.Page
     }
 
     protected void insertMatchup(int summoner_id, int pChampId, int oChampId, int won, int played, int kills, int deaths, int assists, int cs) { 
+        connection.Close();
         MySqlCommand cmd = new MySqlCommand();
         cmd.CommandText = "INSERT INTO lolmatchups.player_matchup(summoner_id, player_champion_id, opponent_champion_id, won, played, kills, deaths, assists, cumulative_creep_score) VALUES (@sid,@pid,@oid,@won,@played,@kills,@deaths,@assists,@cs);";
         cmd.Parameters.Add("@sid", MySqlDbType.Int32);
@@ -2515,6 +2521,7 @@ public partial class _Default : System.Web.UI.Page
     }
 
     protected void insertMastery( int matchup_id, string offense, string defense, string utility, int won, int played, bool fresh ){
+        connection.Close();
         MySqlCommand cmd = new MySqlCommand();
         cmd.CommandText = "INSERT INTO lolmatchups.player_mastery(matchup_id, offense_values, defense_values, utility_values, won, used) VALUES (@mid,@off,@def,@util,@won,@played);";
         cmd.Parameters.Add("@mid", MySqlDbType.Int32);
@@ -2563,6 +2570,7 @@ public partial class _Default : System.Web.UI.Page
     }
 
     protected void insertRunes(int matchup_id, List<int> runes, int won, int played, bool fresh) { 
+        connection.Close();
         MySqlCommand cmd = new MySqlCommand();
         cmd.CommandText = "INSERT INTO lolmatchups.player_rune_set(matchup_id,rune_id1,rune_id2,rune_id3,rune_id4,rune_id5,rune_id6,rune_id7,rune_id8,rune_id9,rune_id10,rune_id11,rune_id12,rune_id13,rune_id14,rune_id15,rune_id16,rune_id17,rune_id18,rune_id19,rune_id20,rune_id21,rune_id22,rune_id23,rune_id24,rune_id25,rune_id26,rune_id27,rune_id28,rune_id29,rune_id30,won,used) VALUES (@mid,@r1,@r2,@r3,@r4,@r5,@r6,@r7,@r8,@r9,@r10,@r11,@r12,@r13,@r14,@r15,@r16,@r17,@r18,@r19,@r20,@r21,@r22,@r23,@r24,@r25,@r26,@r27,@r28,@r29,@r30,@won,@played);";
         cmd.Parameters.Add("@mid", MySqlDbType.Int32);
