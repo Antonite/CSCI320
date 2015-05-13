@@ -62,6 +62,7 @@ public partial class _Default : System.Web.UI.Page
         matchupTopItemsPercent.Text = "";
         matchupTopRunesPercent.Text = "";
         matchupTopMasteriesPercent.Text = "";
+        sumWinRate.Text = "";
         // connection = connectToServer();
     }
 
@@ -733,11 +734,16 @@ public partial class _Default : System.Web.UI.Page
 
             string winPercentAschamp;
             string winPercentVschamp;
+            string totalSummonerPercent;
+            float totalPlayed = 0;
+            float totalWon = 0;
 
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
+                    totalWon += reader.GetFloat(1);
+                    totalPlayed += reader.GetFloat(2);
 
                     winPercentAschamp = Math.Round(reader.GetFloat(1) / reader.GetFloat(2) * 100) + "%";
                     winPercentVschamp = Math.Round(reader.GetFloat(3) / reader.GetFloat(4) * 100) + "%";
@@ -776,6 +782,10 @@ public partial class _Default : System.Web.UI.Page
             {
                 matchupStats.Text = "No data found";
             }
+
+            totalSummonerPercent = Math.Round(totalWon / totalPlayed * 100) + "%";
+            if (totalSummonerPercent.Equals("NaN%")) totalSummonerPercent = "None played";
+            sumWinRate.Text = totalSummonerPercent + " Winrate";
 
             connection.Close();
         }
@@ -907,7 +917,14 @@ public partial class _Default : System.Web.UI.Page
                     {
                         if (aRune.Equals(runeid)) runeCount++;
                     }
-                    runeDict.Add(effectType, runeCount * Double.Parse(effectAmount));
+                    if (runeDict.ContainsKey(effectType))
+                    {
+                        runeDict[effectType] += runeCount * Double.Parse(effectAmount);
+                    }
+                    else
+                    {
+                        runeDict.Add(effectType, runeCount * Double.Parse(effectAmount));
+                    }
 
 
                     

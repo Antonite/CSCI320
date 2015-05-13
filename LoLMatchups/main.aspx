@@ -47,7 +47,7 @@
                                 <img id="sum_avatar" runat="server" src="ProfileImages/ProfileIcon01.jpg" class="avatar"/>
                                 <div id="sum_name" runat="server" class="summoner-name">Summoner Name</div>
                                 <div id="sum_rank" runat="server" class="summoner-rank">Rank</div>
-                                <div id="sum_winrate" runat="server" class="summoner-winrate">W / L</div>
+                                <div id="sum_winrate" runat="server" class="summoner-winrate"><asp:Label ID="sumWinRate" runat="server" Text="sumWinRate"></asp:Label></div>
                             </td>
                         </tr>
                         <tr>
