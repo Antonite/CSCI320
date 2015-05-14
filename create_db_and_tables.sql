@@ -11,7 +11,6 @@ CREATE TABLE `champion` (
   UNIQUE KEY `champion_id_UNIQUE` (`champion_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `item` (
   `item_id` int(10) unsigned NOT NULL,
   `name` varchar(45) NOT NULL,
@@ -24,8 +23,6 @@ CREATE TABLE `item` (
   PRIMARY KEY (`item_id`),
   UNIQUE KEY `item_id_UNIQUE` (`item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
 
 CREATE TABLE `mastery` (
   `mastery_id` int(10) unsigned NOT NULL,
@@ -40,7 +37,6 @@ CREATE TABLE `mastery` (
   PRIMARY KEY (`mastery_id`),
   UNIQUE KEY `mastery_id_UNIQUE` (`mastery_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE `player` (
   `summoner_id` int(10) unsigned NOT NULL,
@@ -104,7 +100,7 @@ CREATE TABLE `player_matchup` (
   CONSTRAINT `fk_matchup_enemy_champ` FOREIGN KEY (`opponent_champion_id`) REFERENCES `champion` (`champion_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_matchup_player_champ` FOREIGN KEY (`player_champion_id`) REFERENCES `champion` (`champion_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_mathcup_summoner` FOREIGN KEY (`summoner_id`) REFERENCES `player` (`summoner_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=9127 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9541 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `player_items` (
   `player_items_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -135,9 +131,7 @@ CREATE TABLE `player_items` (
   CONSTRAINT `fk_item6_items` FOREIGN KEY (`item_id6`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_item7_items` FOREIGN KEY (`item_id7`) REFERENCES `item` (`item_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_item_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9128 DEFAULT CHARSET=utf8;
-
-
+) ENGINE=InnoDB AUTO_INCREMENT=9551 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `player_mastery` (
   `player_mastery_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -150,9 +144,7 @@ CREATE TABLE `player_mastery` (
   PRIMARY KEY (`player_mastery_id`),
   KEY `fk_matchup_mastery_idx` (`matchup_id`),
   CONSTRAINT `fk_mastery_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=9129 DEFAULT CHARSET=utf8;
-
-
+) ENGINE=InnoDB AUTO_INCREMENT=9524 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `player_rune_set` (
   `player_rune_set_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -252,9 +244,7 @@ CREATE TABLE `player_rune_set` (
   CONSTRAINT `fk_rune9_runes` FOREIGN KEY (`rune_id9`) REFERENCES `rune` (`rune_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_runes6_runes` FOREIGN KEY (`rune_id6`) REFERENCES `rune` (`rune_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_rune_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9128 DEFAULT CHARSET=utf8;
-
-
+) ENGINE=InnoDB AUTO_INCREMENT=9522 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `player_summoner_spells` (
   `player_summoner_spells_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -270,8 +260,7 @@ CREATE TABLE `player_summoner_spells` (
   CONSTRAINT `fk_ss1_ss` FOREIGN KEY (`ss_id1`) REFERENCES `summoner_spell` (`summoner_spell_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ss2_ss` FOREIGN KEY (`ss_id2`) REFERENCES `summoner_spell` (`summoner_spell_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ss_matchup` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9128 DEFAULT CHARSET=utf8;
-
+) ENGINE=InnoDB AUTO_INCREMENT=9503 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `best_matchup_items` (
   `matchup_id` int(10) unsigned NOT NULL,
@@ -279,8 +268,8 @@ CREATE TABLE `best_matchup_items` (
   PRIMARY KEY (`matchup_id`),
   UNIQUE KEY `matchup_id_UNIQUE` (`matchup_id`),
   UNIQUE KEY `player_items_id_UNIQUE` (`player_items_id`),
-  CONSTRAINT `fk_player_items_best_items` FOREIGN KEY (`player_items_id`) REFERENCES `player_items` (`player_items_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_matchup_best_items` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_matchup_best_items` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_player_items_best_items` FOREIGN KEY (`player_items_id`) REFERENCES `player_items` (`player_items_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `best_matchup_masteries` (
@@ -299,8 +288,8 @@ CREATE TABLE `best_matchup_rune_set` (
   PRIMARY KEY (`matchup_id`),
   UNIQUE KEY `player_rune_set_id_UNIQUE` (`player_rune_set_id`),
   UNIQUE KEY `matchup_id_UNIQUE` (`matchup_id`),
-  CONSTRAINT `fk_player_runes_best_matchup` FOREIGN KEY (`player_rune_set_id`) REFERENCES `player_rune_set` (`player_rune_set_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_matchup_best_runes` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_matchup_best_runes` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_player_runes_best_matchup` FOREIGN KEY (`player_rune_set_id`) REFERENCES `player_rune_set` (`player_rune_set_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `best_matchup_ss` (
@@ -312,7 +301,3 @@ CREATE TABLE `best_matchup_ss` (
   CONSTRAINT `fk_matchup_best_ss` FOREIGN KEY (`matchup_id`) REFERENCES `player_matchup` (`matchup_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_player_ss_best_matchup` FOREIGN KEY (`player_summoner_spells_id`) REFERENCES `player_summoner_spells` (`player_summoner_spells_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `lolmatchups`.`player` (`summoner_id`,`name`,`rank`,`level`,`last_update_match_id`) VALUES ( 22101250,"Kowz Rule","P4",30,1);
-
-INSERT INTO `lolmatchups`.`player_champion_stat` VALUES (22101250, 266, 1, 1, 0, 0 );

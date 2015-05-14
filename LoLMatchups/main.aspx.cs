@@ -100,6 +100,8 @@ public partial class _Default : System.Web.UI.Page
                 break;
             case 'C': result += "Challenger ";
                 break;
+            case 'U': result += "Unranked";
+                break;
             default: result = "Badly formatted rank";
                 break;
         }
@@ -137,6 +139,12 @@ public partial class _Default : System.Web.UI.Page
                 break;
             case "DIAMOND": rank_string += "D";
                 break;
+            case "": rank_string += "U";
+                break;
+            case "MASTER": rank_string += "M";
+                break;
+            case "CHALLENGER": rank_string += "C";
+                break;
         }
         switch( division ){
             case "I": rank_string += "1";
@@ -148,6 +156,8 @@ public partial class _Default : System.Web.UI.Page
             case "IV": rank_string += "4";
                 break;
             case "V": rank_string += "5";
+                break;
+            case "": rank_string += "1";
                 break;
         }
         return rank_string;
@@ -279,7 +289,6 @@ public partial class _Default : System.Web.UI.Page
     protected void submit(object sender, EventArgs e)
     {
         connection = connectToServer();
-        Debug.WriteLine( "START" );
         MySqlDataReader reader;
         updateDb( summoner_box.Text );
         //search for summoner, Dynamic SQL
@@ -418,7 +427,6 @@ public partial class _Default : System.Web.UI.Page
         cmd.CommandType = CommandType.Text;
         cmd.Connection = connection;
 
-
         //open connection
         try { connection.Open(); }
         catch (Exception conException) { status.Text = "Did not connect to the Database Server."; }
@@ -455,14 +463,42 @@ public partial class _Default : System.Web.UI.Page
                 championVsPath.Value = "ChampionImages\\" + championVsName + "_Square_0.png";
 
                 //fill item images
-                item1Path.Value = "ItemImages\\" + reader.GetString(4) + ".png";
-                item2Path.Value = "ItemImages\\" + reader.GetString(5) + ".png";
-                item3Path.Value = "ItemImages\\" + reader.GetString(6) + ".png";
-                item4Path.Value = "ItemImages\\" + reader.GetString(7) + ".png";
-                item5Path.Value = "ItemImages\\" + reader.GetString(8) + ".png";
-                item6Path.Value = "ItemImages\\" + reader.GetString(9) + ".png";
-                item7Path.Value = "ItemImages\\" + reader.GetString(10) + ".png";
-                
+                if (!reader.IsDBNull(4)) {
+                    item1Path.Value = "ItemImages\\" + reader.GetString(4) + ".png";
+                } else { 
+                    item1Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                if (!reader.IsDBNull(5)) { 
+                    item2Path.Value = "ItemImages\\" + reader.GetString(5) + ".png";
+                } else { 
+                    item2Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                if (!reader.IsDBNull(6)) { 
+                    item3Path.Value = "ItemImages\\" + reader.GetString(6) + ".png";
+                } else { 
+                    item3Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                if (!reader.IsDBNull(7)) {
+                    item4Path.Value = "ItemImages\\" + reader.GetString(7) + ".png";
+                } else { 
+                    item4Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                if (!reader.IsDBNull(8)) { 
+                    item5Path.Value = "ItemImages\\" + reader.GetString(8) + ".png";
+                } else { 
+                    item5Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                if (!reader.IsDBNull(9)) {
+                    item6Path.Value = "ItemImages\\" + reader.GetString(9) + ".png";
+                } else { 
+                    item6Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                if (!reader.IsDBNull(10)) { 
+                    item7Path.Value = "ItemImages\\" + reader.GetString(10) + ".png";
+                } else { 
+                    item7Path.Value = "ItemImages\\EmptyItem.png";
+                }
+                    
                 //get masteries
                 offenceMastery = reader.GetString(13);
                 defenceMastery = reader.GetString(14);
@@ -477,7 +513,6 @@ public partial class _Default : System.Web.UI.Page
                     else { runeList[i - 18] = aRune; }
                     //matchupTopRunesPercent.Text += runeList[i - 18] + ",";
                 }
- 
 
                 connection.Close();
 
@@ -1138,7 +1173,6 @@ public partial class _Default : System.Web.UI.Page
 
     private void updateDb(String summoner_name)
     {
-        Debug.WriteLine( "updateDb");
         connection.Close();
         MySqlDataReader reader;
         MySqlCommand cmd = new MySqlCommand();
@@ -1148,7 +1182,7 @@ public partial class _Default : System.Web.UI.Page
         cmd.CommandType = CommandType.Text;
         //open connection
         cmd.Connection = connection;
-        try{connection.Open();} catch (Exception e) { Debug.WriteLine("!!!!!!" + e.Message);}
+        try{connection.Open();} catch (Exception e) { Debug.WriteLine(e.Message);}
          
         
         try { 
@@ -1162,34 +1196,49 @@ public partial class _Default : System.Web.UI.Page
                 reader.Close();
 
                 String url = "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/" + summoner_id.ToString() + "?rankedQueues=RANKED_SOLO_5x5,RANKED_TEAM_5x5&api_key=" + API_KEY;
-                MatchHistoryResponse json_response = new MatchHistoryResponse();
+                HttpWebResponse mh_response1 = executeApiRequest( url );
+                List<PlayerReturnData> mh1  = parseMhResponse( mh_response1, summoner_id, last_match_id );
+                new_last_match_id = mh1[0].match_id;
+                if (new_last_match_id != last_match_id) { 
+                    String league_url = "https://na.api.pvp.net/api/lol/na/v2.5/league/by-summoner/" + summoner_id + "/entry?api_key=" + API_KEY;
+                    HttpWebResponse league_response = executeApiRequest( league_url );
+                    Dictionary<string, League[]> league_json_response = new JavaScriptSerializer().Deserialize<Dictionary<string, League[]>>( new StreamReader( league_response.GetResponseStream() ).ReadToEnd() );
                 
-                HttpWebResponse response = executeApiRequest( url );
-                try { 
-                    Match[] mh_matches = json_response.matches;
-                    for (int i = 0; i < mh_matches.Length; i++) { 
-                        Match mh_match = mh_matches[i];
-                        if (mh_match.matchId == last_match_id) { 
+                    League[] summoner_leagues = league_json_response[summoner_id.ToString()];
+                    string tier = "";
+                    string division = "";
+                    foreach (League league in summoner_leagues) {
+                        if (league.queue == "RANKED_SOLO_5x5") { 
+                            tier = league.tier;
+                            division = league.entries[0].division;
                             break;
-                        } else if (i == 0) { 
-                            new_last_match_id = mh_match.matchId;
                         }
-                        Console.WriteLine( last_match_id.ToString() );
                     }
-                } catch (Exception e) { Debug.WriteLine( e.Message ); }
+                    string rank_string = parseApiRank( tier, division );
+                    cmd = new MySqlCommand();
+                    cmd.CommandText = "UPDATE player SET rank=@rank, last_update_match_id=@last_update_match_id WHERE summoner_id=@sid;";
+                    cmd.Parameters.Add("@sid",MySqlDbType.UInt32);
+                    cmd.Parameters["@sid"].Value = summoner_id;
+                    cmd.Parameters.Add("@rank",MySqlDbType.VarChar);
+                    cmd.Parameters["@rank"].Value = rank_string;
+                    cmd.Parameters.Add("@last_update_match_id",MySqlDbType.UInt32);
+                    cmd.Parameters["@last_update_match_id"].Value = new_last_match_id;
+                    cmd.Connection = connection;
+                    connection.Open();
+                    cmd.ExecuteNonQuery();
+                    connection.Close();
+                }
+                
             } else {
-                Debug.WriteLine("No Record");
                 connection.Close();
                 reader.Close();
                 //Get summoner ID and build a simple match history
                 String summoner_url = "https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summoner_name + "?api_key=" + API_KEY;
-                
                 HttpWebResponse response = executeApiRequest( summoner_url );
-                
-                 
                 Dictionary<string, SummonerInfo> json_response = new JavaScriptSerializer().Deserialize<Dictionary<string, SummonerInfo>>( new StreamReader( response.GetResponseStream() ).ReadToEnd() );
 
-                string stored_summoner_name = summoner_name.ToLower().Trim(); 
+                
+                string stored_summoner_name = summoner_name.ToLower().Trim().Replace( " ", "" );
                 SummonerInfo s_info = json_response[stored_summoner_name];
 
                 String mh_url1 = "https://na.api.pvp.net/api/lol/na/v2.2/matchhistory/" + s_info.id + "?rankedQueues=RANKED_SOLO_5x5,RANKED_TEAM_5x5&api_key=" + API_KEY;
@@ -1217,7 +1266,6 @@ public partial class _Default : System.Web.UI.Page
                         break;
                     }
                 }
-                
                 string rank_string = parseApiRank( tier, division );
                 cmd = new MySqlCommand();
                 cmd.CommandText = "INSERT INTO player VALUES (@sid, @name, @rank, @level, @last_update_match_id);";
@@ -1236,9 +1284,7 @@ public partial class _Default : System.Web.UI.Page
 
                 cmd.ExecuteNonQuery();
                 connection.Close();
-                Debug.WriteLine( "first");
                 updateRows( mh1, s_info.id );
-                Debug.WriteLine( "second" );
                 updateRows( mh2, s_info.id );
             }
         }catch( Exception e ){ Debug.WriteLine( e.ToString() ); }
